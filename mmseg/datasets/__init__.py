@@ -27,6 +27,7 @@ from .refuge import REFUGEDataset
 from .stare import STAREDataset
 from .synapse import SynapseDataset
 from .railsem19 import RailSem19Dataset
+from .rtis_rail import RTISRailDataset
 # yapf: disable
 from .transforms import (CLAHE, AdjustGamma, Albu, BioMedical3DPad,
                          BioMedical3DRandomCrop, BioMedical3DRandomFlip,
@@ -105,4 +106,5 @@ __all__ = [
     "NYUDataset",
     "HSIDrive20Dataset",
     "RailSem19Dataset",
+    "RTISRailDataset",
 ]
