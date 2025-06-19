@@ -14,41 +14,11 @@ model = dict(data_preprocessor=data_preprocessor)
 model.update(
     decode_head=dict(
         num_classes=19,
-        loss_decode=[
-            dict(
-                type="CrossEntropyLoss",
-                loss_name="loss_ce",
-                loss_weight=1.0,
-                class_weight=[1.0] * 19 + [0.1],
-            ),  # 19 classes + 1 background
-            dict(
-                type="DiceLoss",
-                ignore_index=None,
-                naive_dice=True,
-                eps=1,
-                loss_name="loss_dice",
-                loss_weight=3.0,
-            ),
-        ],
+        loss_decode=dict(type="CrossEntropyLoss"),
     ),
     auxiliary_head=dict(
         num_classes=19,
-        loss_decode=[
-            dict(
-                type="CrossEntropyLoss",
-                loss_name="loss_ce_aux",
-                loss_weight=0.4,
-                class_weight=[1.0] * 19 + [0.1],
-            ),  # 19 classes + 1 background
-            dict(
-                type="DiceLoss",
-                ignore_index=None,
-                naive_dice=True,
-                eps=1,
-                loss_name="loss_dice_aux",
-                loss_weight=1.2,
-            ),
-        ],
+        loss_decode=dict(type="CrossEntropyLoss"),
     ),
 )
 

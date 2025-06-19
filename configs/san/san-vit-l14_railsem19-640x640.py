@@ -45,11 +45,11 @@ test_dataloader = val_dataloader
 
 # Model configuration for ViT-L14
 model = dict(
-    type='MultimodalEncoderDecoder',
+    type="MultimodalEncoderDecoder",
     pretrained=pretrained,
     encoder_resolution=0.7,
     image_encoder=dict(
-        type='VisionTransformer',
+        type="VisionTransformer",
         img_size=(336, 336),
         patch_size=14,
         patch_pad=0,
@@ -57,11 +57,14 @@ model = dict(
         num_layers=18,
         num_heads=16,
         out_indices=(5, 11, 17),
-        frozen_exclude=['pos_embed', 'cls_token'],  # Make position embedding and cls token trainable
+        frozen_exclude=[
+            "pos_embed",
+            "cls_token",
+        ],  # Make position embedding and cls token trainable
     ),
     text_encoder=dict(
-        type='CLIPTextEncoder',
-        dataset_name='railsem19',  # Update for RailSem19
+        type="CLIPTextEncoder",
+        dataset_name="railsem19",  # Update for RailSem19
         embed_dims=768,
         num_layers=12,
         num_heads=12,
@@ -69,7 +72,7 @@ model = dict(
         # Note: CLIPTextEncoder doesn't support frozen_exclude, all parameters are frozen by default
     ),
     decode_head=dict(
-        type='SideAdapterCLIPHead',
+        type="SideAdapterCLIPHead",
         num_classes=19,  # RailSem19 has 19 classes
         san_cfg=dict(clip_channels=1024, cfg_decoder=dict(num_heads=16)),
         maskgen_cfg=dict(
@@ -77,24 +80,14 @@ model = dict(
             embed_dims=1024,
             num_heads=16,
             out_dims=768,
-            frozen_exclude=['all'],  # Make all parameters in maskgen trainable
+            frozen_exclude=["all"],  # Make all parameters in maskgen trainable
         ),
         loss_decode=[
-            dict(type='CrossEntropyLoss',
-                 loss_name='loss_cls_ce',
-                 loss_weight=2.0,
-                 class_weight=[1.0] * 19 + [0.1]),  # 19 classes + 1 background
-            dict(type='CrossEntropyLoss',
-                 use_sigmoid=True,
-                 loss_name='loss_mask_ce',
-                 loss_weight=5.0),
-            dict(type='DiceLoss',
-                 ignore_index=None,
-                 naive_dice=True,
-                 eps=1,
-                 loss_name='loss_mask_dice',
-                 loss_weight=5.0)
-        ]))
+            dict(type="CrossEntropyLoss", loss_name="loss_cls_ce"),
+            dict(type="CrossEntropyLoss", loss_name="loss_mask_ce"),
+        ],
+    ),
+)
 
 # Training schedule for transfer learning (shorter schedule)
 train_cfg = dict(

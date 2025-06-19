@@ -26,22 +26,7 @@ model = dict(
     decode_head=dict(
         in_channels=[64, 128, 320, 512],
         num_classes=19,  # Railsem19 has 19 classes
-        loss_decode=[
-            dict(
-                type="CrossEntropyLoss",
-                loss_name="loss_ce",
-                loss_weight=1.0,
-                class_weight=[1.0] * 19 + [0.1],
-            ),  # 19 classes + 1 background
-            dict(
-                type="DiceLoss",
-                ignore_index=None,
-                naive_dice=True,
-                eps=1,
-                loss_name="loss_dice",
-                loss_weight=3.0,
-            ),
-        ],
+        loss_decode=dict(type="CrossEntropyLoss"),
     ),
     test_cfg=dict(mode="slide", crop_size=(1024, 1024), stride=(768, 768)),
 )
