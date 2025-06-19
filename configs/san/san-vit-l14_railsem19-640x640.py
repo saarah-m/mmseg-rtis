@@ -57,6 +57,7 @@ model = dict(
         num_layers=18,
         num_heads=16,
         out_indices=(5, 11, 17),
+        frozen_exclude=['pos_embed', 'cls_token'],  # Make position embedding and cls token trainable
     ),
     text_encoder=dict(
         type='CLIPTextEncoder',
@@ -65,6 +66,7 @@ model = dict(
         num_layers=12,
         num_heads=12,
         output_dims=768,
+        # Note: CLIPTextEncoder doesn't support frozen_exclude, all parameters are frozen by default
     ),
     decode_head=dict(
         type='SideAdapterCLIPHead',
@@ -75,6 +77,7 @@ model = dict(
             embed_dims=1024,
             num_heads=16,
             out_dims=768,
+            frozen_exclude=['all'],  # Make all parameters in maskgen trainable
         ),
         loss_decode=[
             dict(type='CrossEntropyLoss',
