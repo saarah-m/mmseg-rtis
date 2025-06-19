@@ -132,11 +132,17 @@ optim_wrapper = dict(
 # Learning rate scheduler for transfer learning
 param_scheduler = [
     dict(
-        type='PolyLR',
+        type="PolyLR",
         eta_min=0.0,
         power=1.0,
         begin=0,
         end=40000,  # Match max_iters
         by_epoch=False,
     )
-] 
+]
+
+# Enable TensorBoard visualization
+vis_backends = [dict(type="LocalVisBackend"), dict(type="TensorboardVisBackend")]
+visualizer = dict(
+    type="SegLocalVisualizer", vis_backends=vis_backends, name="visualizer"
+)
