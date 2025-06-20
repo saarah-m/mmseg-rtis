@@ -1,9 +1,9 @@
-# configs/ann/ann_r50-d8_4xb2-40k_railsem19-768x1024.py
+# configs/ann/ann_r50-d8_4xb2-160k_railsem19-768x1024.py
 _base_ = [
     "../_base_/models/ann_r50-d8.py",
     "../_base_/datasets/railsem19.py",
     "../_base_/default_runtime.py",
-    "../_base_/schedules/schedule_40k.py",
+    "../_base_/schedules/schedule_160k.py",
 ]
 
 # –– Reduce crop size to lower memory per image ––

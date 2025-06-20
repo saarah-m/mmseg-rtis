@@ -92,9 +92,9 @@ model = dict(
 # Training schedule for transfer learning (shorter schedule)
 train_cfg = dict(
     type='IterBasedTrainLoop',
-    max_iters=40000,  # Reduced for transfer learning
+    max_iters=160000,  # Updated to 160k iterations
     val_interval=500,
-    val_begin=35000)
+    val_begin=140000)  # Updated to start validation at 140k
 
 default_hooks = dict(
     checkpoint=dict(
@@ -129,7 +129,7 @@ param_scheduler = [
         eta_min=0.0,
         power=1.0,
         begin=0,
-        end=40000,  # Match max_iters
+        end=160000,  # Updated to match max_iters
         by_epoch=False,
     )
 ]
