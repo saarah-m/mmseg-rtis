@@ -1,5 +1,5 @@
 _base_ = [
-    '../_base_/datasets/railsem19.py',
+    '../_base_/datasets/railsem19_1024x1024.py',
     '../_base_/default_runtime.py',
 ]
 

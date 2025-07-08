@@ -189,11 +189,13 @@ class DDRNet(BaseModule):
         comp_c = self.compression_1(self.relu(x_c))
         x_c += self.down_1(self.relu(x_s))
         # Use x_s.shape to ensure size compatibility
-        x_s += resize(
-            comp_c,
-            size=x_s.shape[-2:],
-            mode='bilinear',
-            align_corners=self.align_corners)
+        # Check for zero dimensions before resize
+        if x_s.shape[-2] > 0 and x_s.shape[-1] > 0 and comp_c.shape[-2] > 0 and comp_c.shape[-1] > 0:
+            x_s += resize(
+                comp_c,
+                size=x_s.shape[-2:],
+                mode='bilinear',
+                align_corners=self.align_corners)
         if self.training:
             temp_context = x_s.clone()
 
@@ -203,21 +205,25 @@ class DDRNet(BaseModule):
         comp_c = self.compression_2(self.relu(x_c))
         x_c += self.down_2(self.relu(x_s))
         # Use x_s.shape to ensure size compatibility
-        x_s += resize(
-            comp_c,
-            size=x_s.shape[-2:],
-            mode='bilinear',
-            align_corners=self.align_corners)
+        # Check for zero dimensions before resize
+        if x_s.shape[-2] > 0 and x_s.shape[-1] > 0 and comp_c.shape[-2] > 0 and comp_c.shape[-1] > 0:
+            x_s += resize(
+                comp_c,
+                size=x_s.shape[-2:],
+                mode='bilinear',
+                align_corners=self.align_corners)
 
         # stage5
         x_s = self.spatial_branch_layers[2](self.relu(x_s))
         x_c = self.context_branch_layers[2](self.relu(x_c))
         x_c = self.spp(x_c)
         # Use x_s.shape to ensure size compatibility
-        x_c = resize(
-            x_c,
-            size=x_s.shape[-2:],
-            mode='bilinear',
-            align_corners=self.align_corners)
+        # Check for zero dimensions before resize
+        if x_s.shape[-2] > 0 and x_s.shape[-1] > 0 and x_c.shape[-2] > 0 and x_c.shape[-1] > 0:
+            x_c = resize(
+                x_c,
+                size=x_s.shape[-2:],
+                mode='bilinear',
+                align_corners=self.align_corners)
 
         return (temp_context, x_s + x_c) if self.training else x_s + x_c
