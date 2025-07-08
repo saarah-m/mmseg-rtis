@@ -180,8 +180,6 @@ class DDRNet(BaseModule):
 
     def forward(self, x):
         """Forward function."""
-        out_size = (x.shape[-2] // 8, x.shape[-1] // 8)
-
         # stage 0-2
         x = self.stem(x)
 
@@ -190,9 +188,10 @@ class DDRNet(BaseModule):
         x_s = self.spatial_branch_layers[0](x)
         comp_c = self.compression_1(self.relu(x_c))
         x_c += self.down_1(self.relu(x_s))
+        # Use x_s.shape to ensure size compatibility
         x_s += resize(
             comp_c,
-            size=out_size,
+            size=x_s.shape[-2:],
             mode='bilinear',
             align_corners=self.align_corners)
         if self.training:
@@ -203,9 +202,10 @@ class DDRNet(BaseModule):
         x_s = self.spatial_branch_layers[1](self.relu(x_s))
         comp_c = self.compression_2(self.relu(x_c))
         x_c += self.down_2(self.relu(x_s))
+        # Use x_s.shape to ensure size compatibility
         x_s += resize(
             comp_c,
-            size=out_size,
+            size=x_s.shape[-2:],
             mode='bilinear',
             align_corners=self.align_corners)
 
@@ -213,9 +213,10 @@ class DDRNet(BaseModule):
         x_s = self.spatial_branch_layers[2](self.relu(x_s))
         x_c = self.context_branch_layers[2](self.relu(x_c))
         x_c = self.spp(x_c)
+        # Use x_s.shape to ensure size compatibility
         x_c = resize(
             x_c,
-            size=out_size,
+            size=x_s.shape[-2:],
             mode='bilinear',
             align_corners=self.align_corners)
 
