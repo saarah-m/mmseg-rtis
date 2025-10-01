@@ -1,24 +1,18 @@
 _base_ = [
     "../_base_/models/segformer_mit-b0.py",
-    "../_base_/datasets/railsem19_1024x1024.py",
+    "../_base_/datasets/mapillary_v1.py",
     "../_base_/default_runtime.py",
     "../_base_/schedules/schedule_160k.py",
 ]
 
-# Experiment: Mapillary → CityScapes → RailSem19
-# This configuration trains a model on Mapillary, then CityScapes, then fine-tunes on RailSem19
+# This configuration is the first stage of Experiment 3
+# It pre-trains a model on the Mapillary dataset.
 
 crop_size = (1024, 1024)
 data_preprocessor = dict(size=crop_size)
 
-# Load pretrained weights from Mapillary
+# Load pretrained weights
 checkpoint = "https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b0_20220624-7e0fe6dd.pth"
-
-# Enable TensorBoard visualization
-vis_backends = [dict(type="LocalVisBackend"), dict(type="TensorboardVisBackend")]
-visualizer = dict(
-    type="SegLocalVisualizer", vis_backends=vis_backends, name="visualizer"
-)
 
 model = dict(
     data_preprocessor=data_preprocessor,
@@ -26,18 +20,12 @@ model = dict(
         init_cfg=dict(type="Pretrained", checkpoint=checkpoint),
     ),
     decode_head=dict(
-        num_classes=19,  # RailSem19 has 19 classes
-        ignore_index=255,
-        loss_decode=dict(
-            type="CrossEntropyLoss",
-            use_sigmoid=False,
-            loss_weight=1.0
-        ),
+        num_classes=65,  # Mapillary v1 has 65 classes
     ),
-    test_cfg=dict(mode="slide", crop_size=(1024, 1024), stride=(768, 768)),
+    test_cfg=dict(mode="slide", crop_size=crop_size, stride=(768, 768)),
 )
 
-# Optimizer configuration for multi-stage domain adaptation
+# Optimizer configuration
 optim_wrapper = dict(
     _delete_=True,
     type="OptimWrapper",
@@ -46,12 +34,12 @@ optim_wrapper = dict(
         custom_keys={
             "pos_block": dict(decay_mult=0.0),
             "norm": dict(decay_mult=0.0),
-            "head": dict(lr_mult=10.0),  # Higher learning rate for head
+            "head": dict(lr_mult=10.0),
         }
     ),
 )
 
-# Learning rate schedule for multi-stage domain adaptation
+# Learning rate schedule
 param_scheduler = [
     dict(type="LinearLR", start_factor=1e-6, by_epoch=False, begin=0, end=1500),
     dict(
@@ -68,8 +56,3 @@ param_scheduler = [
 train_dataloader = dict(batch_size=1, num_workers=4)
 val_dataloader = dict(batch_size=1, num_workers=4)
 test_dataloader = val_dataloader
-
-# Experiment metadata
-experiment_name = "mapillary_cityscapes_to_railsem19"
-source_datasets = ["mapillary", "cityscapes"]
-target_dataset = "railsem19"

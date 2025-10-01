@@ -118,3 +118,5 @@ mmseg/.mim
 
 # Pytorch
 *.pth
+work_dirs
+work_dirs_old
