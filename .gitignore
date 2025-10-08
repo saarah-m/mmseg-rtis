@@ -105,7 +105,7 @@ venv.bak/
 # mypy
 .mypy_cache/
 
-data
+data/
 .vscode
 .idea
 
@@ -113,10 +113,13 @@ data
 *.pkl
 *.pkl.json
 *.log.json
-work_dirs/
 mmseg/.mim
 
-# Pytorch
+# Training outputs - ignore checkpoints and logs but keep config files
 *.pth
-work_dirs
-work_dirs_old
+*.pth.tar
+*.ckpt
+*.log
+*.json
+!**/config*.py
+!**/experiment*.py

@@ -1,0 +1,63 @@
+
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Domain Adaptation Experiments Comparison</title>
+        <style>
+            body { font-family: Arial, sans-serif; margin: 40px; }
+            h1 { color: #333; }
+            table { border-collapse: collapse; width: 100%; margin: 20px 0; }
+            th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+            th { background-color: #f2f2f2; font-weight: bold; }
+            .best { background-color: #d4edda; }
+            .worst { background-color: #f8d7da; }
+        </style>
+    </head>
+    <body>
+        <h1>Domain Adaptation Experiments Comparison</h1>
+        
+        <h2>Results Summary</h2>
+        <table border="1" class="dataframe table">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Experiment</th>
+      <th>mIoU</th>
+      <th>Work Directory</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>CityScapes → RailSem19</td>
+      <td>0</td>
+      <td>work_dirs/domain_adaptation/experiment1_cityscapes_to_railsem19</td>
+    </tr>
+    <tr>
+      <td>Mapillary → RailSem19</td>
+      <td>0</td>
+      <td>work_dirs/domain_adaptation/experiment2_mapillary_to_railsem19</td>
+    </tr>
+    <tr>
+      <td>Mapillary → CityScapes → RailSem19</td>
+      <td>0</td>
+      <td>work_dirs/domain_adaptation/experiment3_mapillary_cityscapes_to_railsem19</td>
+    </tr>
+  </tbody>
+</table>
+        
+        <h2>Experiment Details</h2>
+        <ul>
+    <li><strong>exp1:</strong> CityScapes → RailSem19</li><li><strong>exp2:</strong> Mapillary → RailSem19</li><li><strong>exp3:</strong> Mapillary → CityScapes → RailSem19</li>
+        </ul>
+        
+        <h2>Analysis</h2>
+        <p>This comparison shows the performance of different domain adaptation strategies:</p>
+        <ul>
+            <li><strong>CityScapes → RailSem19:</strong> Direct adaptation from urban scenes</li>
+            <li><strong>Mapillary → RailSem19:</strong> Direct adaptation from diverse street scenes</li>
+            <li><strong>Mapillary → CityScapes → RailSem19:</strong> Multi-stage adaptation</li>
+        </ul>
+        
+        <p><em>Generated on: {datetime.now()}</em></p>
+    </body>
+    </html>
+    

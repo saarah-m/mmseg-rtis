@@ -1,0 +1,4 @@
+Experiment,mIoU,Work Directory
+CityScapes → RailSem19,0,work_dirs/domain_adaptation/experiment1_cityscapes_to_railsem19
+Mapillary → RailSem19,0,work_dirs/domain_adaptation/experiment2_mapillary_to_railsem19
+Mapillary → CityScapes → RailSem19,0,work_dirs/domain_adaptation/experiment3_mapillary_cityscapes_to_railsem19
