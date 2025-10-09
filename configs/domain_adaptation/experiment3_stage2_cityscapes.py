@@ -11,6 +11,12 @@ _base_ = [
 crop_size = (1024, 1024)
 data_preprocessor = dict(size=crop_size)
 
+# Enable TensorBoard visualization
+vis_backends = [dict(type="LocalVisBackend"), dict(type="TensorboardVisBackend")]
+visualizer = dict(
+    type="SegLocalVisualizer", vis_backends=vis_backends, name="visualizer"
+)
+
 model = dict(
     data_preprocessor=data_preprocessor,
     decode_head=dict(

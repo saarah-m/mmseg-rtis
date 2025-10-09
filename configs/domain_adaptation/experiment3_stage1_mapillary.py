@@ -14,6 +14,12 @@ data_preprocessor = dict(size=crop_size)
 # Load pretrained weights
 checkpoint = "https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b0_20220624-7e0fe6dd.pth"
 
+# Enable TensorBoard visualization
+vis_backends = [dict(type="LocalVisBackend"), dict(type="TensorboardVisBackend")]
+visualizer = dict(
+    type="SegLocalVisualizer", vis_backends=vis_backends, name="visualizer"
+)
+
 model = dict(
     data_preprocessor=data_preprocessor,
     backbone=dict(
