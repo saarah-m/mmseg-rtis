@@ -30,8 +30,9 @@ data_preprocessor = dict(
         57.375,
     ],
     type='SegDataPreProcessor')
-data_root = 'data/mapillary/'
-dataset_type = 'MapillaryDataset_v1'
+data_root = 'data/cityscapes/'
+dataset = 'cityscapes'
+dataset_type = 'CityscapesDataset'
 default_hooks = dict(
     checkpoint=dict(
         by_epoch=False,
@@ -50,6 +51,7 @@ env_cfg = dict(
     cudnn_benchmark=True,
     dist_cfg=dict(backend='nccl'),
     mp_cfg=dict(mp_start_method='fork', opencv_num_threads=0))
+experiment_name = 'experiment2_stage1_cityscapes'
 img_ratios = [
     0.5,
     0.75,
@@ -146,7 +148,7 @@ model = dict(
         loss_decode=dict(
             loss_weight=1.0, type='CrossEntropyLoss', use_sigmoid=False),
         norm_cfg=dict(requires_grad=True, type='SyncBN'),
-        num_classes=66,
+        num_classes=19,
         type='SegformerHead'),
     pretrained=None,
     test_cfg=dict(crop_size=(
@@ -190,9 +192,8 @@ test_dataloader = dict(
     batch_size=1,
     dataset=dict(
         data_prefix=dict(
-            img_path='validation/images',
-            seg_map_path='validation/v1.2/labels'),
-        data_root='data/mapillary/',
+            img_path='leftImg8bit/val', seg_map_path='gtFine/val'),
+        data_root='data/cityscapes/',
         pipeline=[
             dict(type='LoadImageFromFile'),
             dict(keep_ratio=True, scale=(
@@ -202,7 +203,7 @@ test_dataloader = dict(
             dict(type='LoadAnnotations'),
             dict(type='PackSegInputs'),
         ],
-        type='MapillaryDataset_v1'),
+        type='CityscapesDataset'),
     num_workers=4,
     persistent_workers=True,
     sampler=dict(shuffle=False, type='DefaultSampler'))
@@ -225,8 +226,8 @@ train_dataloader = dict(
     batch_size=1,
     dataset=dict(
         data_prefix=dict(
-            img_path='training/images', seg_map_path='training/v1.2/labels'),
-        data_root='data/mapillary/',
+            img_path='leftImg8bit/train', seg_map_path='gtFine/train'),
+        data_root='data/cityscapes/',
         pipeline=[
             dict(type='LoadImageFromFile'),
             dict(type='LoadAnnotations'),
@@ -242,15 +243,17 @@ train_dataloader = dict(
                 ),
                 type='RandomResize'),
             dict(
-                cat_max_ratio=0.75, crop_size=(
-                    512,
+                cat_max_ratio=0.75,
+                crop_size=(
                     1024,
-                ), type='RandomCrop'),
+                    1024,
+                ),
+                type='RandomCrop'),
             dict(prob=0.5, type='RandomFlip'),
             dict(type='PhotoMetricDistortion'),
             dict(type='PackSegInputs'),
         ],
-        type='MapillaryDataset_v1'),
+        type='CityscapesDataset'),
     num_workers=4,
     persistent_workers=True,
     sampler=dict(shuffle=True, type='InfiniteSampler'))
@@ -269,7 +272,7 @@ train_pipeline = [
         ),
         type='RandomResize'),
     dict(cat_max_ratio=0.75, crop_size=(
-        512,
+        1024,
         1024,
     ), type='RandomCrop'),
     dict(prob=0.5, type='RandomFlip'),
@@ -278,7 +281,7 @@ train_pipeline = [
 ]
 tta_model = dict(type='SegTTAModel')
 tta_pipeline = [
-    dict(file_client_args=dict(backend='disk'), type='LoadImageFromFile'),
+    dict(backend_args=None, type='LoadImageFromFile'),
     dict(
         transforms=[
             [
@@ -307,9 +310,8 @@ val_dataloader = dict(
     batch_size=1,
     dataset=dict(
         data_prefix=dict(
-            img_path='validation/images',
-            seg_map_path='validation/v1.2/labels'),
-        data_root='data/mapillary/',
+            img_path='leftImg8bit/val', seg_map_path='gtFine/val'),
+        data_root='data/cityscapes/',
         pipeline=[
             dict(type='LoadImageFromFile'),
             dict(keep_ratio=True, scale=(
@@ -319,7 +321,7 @@ val_dataloader = dict(
             dict(type='LoadAnnotations'),
             dict(type='PackSegInputs'),
         ],
-        type='MapillaryDataset_v1'),
+        type='CityscapesDataset'),
     num_workers=4,
     persistent_workers=True,
     sampler=dict(shuffle=False, type='DefaultSampler'))
@@ -338,4 +340,4 @@ visualizer = dict(
         dict(type='LocalVisBackend'),
         dict(type='TensorboardVisBackend'),
     ])
-work_dir = 'work_dirs/domain_adaptation/experiment3/stage1_mapillary'
+work_dir = 'work_dirs/domain_adaptation/experiment2/stage1_cityscapes'

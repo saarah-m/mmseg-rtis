@@ -31,6 +31,7 @@ data_preprocessor = dict(
     ],
     type='SegDataPreProcessor')
 data_root = 'data/mapillary/'
+dataset = 'mapillary'
 dataset_type = 'MapillaryDataset_v1'
 default_hooks = dict(
     checkpoint=dict(
@@ -50,6 +51,7 @@ env_cfg = dict(
     cudnn_benchmark=True,
     dist_cfg=dict(backend='nccl'),
     mp_cfg=dict(mp_start_method='fork', opencv_num_threads=0))
+experiment_name = 'experiment1_stage1_mapillary'
 img_ratios = [
     0.5,
     0.75,
@@ -338,4 +340,4 @@ visualizer = dict(
         dict(type='LocalVisBackend'),
         dict(type='TensorboardVisBackend'),
     ])
-work_dir = 'work_dirs/domain_adaptation/experiment3/stage1_mapillary'
+work_dir = 'work_dirs/domain_adaptation/experiment1/stage1_mapillary'

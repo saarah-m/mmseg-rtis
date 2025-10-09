@@ -1,17 +1,18 @@
 _base_ = [
     "../_base_/models/segformer_mit-b0.py",
-    "../_base_/datasets/mapillary_v1.py",
+    "../_base_/datasets/cityscapes_1024x1024.py",
     "../_base_/default_runtime.py",
     "../_base_/schedules/schedule_160k.py",
 ]
 
-# This configuration is the first stage of Experiment 3
-# It pre-trains a model on the Mapillary dataset.
+# Experiment 2 - Stage 1: Train on Cityscapes
+# This is the first stage where we pre-train the model on Cityscapes dataset.
+# The resulting checkpoint will be used in experiment2_cityscapes_to_railsem19.py
 
 crop_size = (1024, 1024)
 data_preprocessor = dict(size=crop_size)
 
-# Load pretrained weights
+# Load pretrained weights from ImageNet
 checkpoint = "https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b0_20220624-7e0fe6dd.pth"
 
 # Enable TensorBoard visualization
@@ -20,13 +21,17 @@ visualizer = dict(
     type="SegLocalVisualizer", vis_backends=vis_backends, name="visualizer"
 )
 
+# Experiment metadata
+experiment_name = "experiment2_stage1_cityscapes"
+dataset = "cityscapes"
+
 model = dict(
     data_preprocessor=data_preprocessor,
     backbone=dict(
         init_cfg=dict(type="Pretrained", checkpoint=checkpoint),
     ),
     decode_head=dict(
-        num_classes=66,  # Mapillary v1 has 65 classes
+        num_classes=19,  # Cityscapes has 19 classes
         ignore_index=255,
         loss_decode=dict(
             type='CrossEntropyLoss', 
@@ -101,3 +106,4 @@ default_hooks = dict(
         rule='greater'
     )
 )
+

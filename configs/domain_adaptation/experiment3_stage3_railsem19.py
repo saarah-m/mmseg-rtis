@@ -45,7 +45,7 @@ optim_wrapper = dict(
     ),
 )
 
-# Learning rate schedule
+# Learning rate schedule - extended to allow convergence
 param_scheduler = [
     dict(type="LinearLR", start_factor=1e-6, by_epoch=False, begin=0, end=1500),
     dict(
@@ -53,13 +53,46 @@ param_scheduler = [
         eta_min=0.0,
         power=1.0,
         begin=1500,
-        end=160000,
+        end=320000,  # Extended from 160k to 320k to allow convergence
         by_epoch=False,
     ),
 ]
 
-# Training configuration
+# Training configuration - extended with early stopping
+train_cfg = dict(
+    type='IterBasedTrainLoop',
+    max_iters=320000,  # Extended to allow full convergence
+    val_interval=16000  # Validate every 16k iterations
+)
+
+val_cfg = dict(type='ValLoop')
+test_cfg = dict(type='TestLoop')
+
+# Training dataloaders
 train_dataloader = dict(batch_size=1, num_workers=4)
 val_dataloader = dict(batch_size=1, num_workers=4)
 test_dataloader = val_dataloader
+
+# Early Stopping - automatically stops when converged
+custom_hooks = [
+    dict(
+        type='EarlyStoppingHook',
+        monitor='mIoU',
+        patience=3,  # Stop if no improvement for 3 validation checks (48k iterations)
+        rule='greater',
+        min_delta=0.2,  # Minimum improvement threshold (0.2% mIoU)
+    )
+]
+
+# Checkpoint saving - save best model
+default_hooks = dict(
+    checkpoint=dict(
+        type='CheckpointHook',
+        by_epoch=False,
+        interval=16000,
+        max_keep_ckpts=5,
+        save_best='mIoU',
+        rule='greater'
+    )
+)
 

@@ -3,14 +3,6 @@ crop_size = (
     1024,
     1024,
 )
-custom_hooks = [
-    dict(
-        min_delta=0.2,
-        monitor='mIoU',
-        patience=3,
-        rule='greater',
-        type='EarlyStoppingHook'),
-]
 data_preprocessor = dict(
     bgr_to_rgb=True,
     mean=[
@@ -33,13 +25,7 @@ data_preprocessor = dict(
 data_root = 'data/mapillary/'
 dataset_type = 'MapillaryDataset_v1'
 default_hooks = dict(
-    checkpoint=dict(
-        by_epoch=False,
-        interval=16000,
-        max_keep_ckpts=5,
-        rule='greater',
-        save_best='mIoU',
-        type='CheckpointHook'),
+    checkpoint=dict(by_epoch=False, interval=16000, type='CheckpointHook'),
     logger=dict(interval=50, log_metric_by_epoch=False, type='LoggerHook'),
     param_scheduler=dict(type='ParamSchedulerHook'),
     sampler_seed=dict(type='DistSamplerSeedHook'),
@@ -179,7 +165,7 @@ param_scheduler = [
     dict(
         begin=1500,
         by_epoch=False,
-        end=320000,
+        end=160000,
         eta_min=0.0,
         power=1.0,
         type='PolyLR'),
@@ -220,7 +206,7 @@ test_pipeline = [
     dict(type='PackSegInputs'),
 ]
 train_cfg = dict(
-    max_iters=320000, type='IterBasedTrainLoop', val_interval=16000)
+    max_iters=160000, type='IterBasedTrainLoop', val_interval=16000)
 train_dataloader = dict(
     batch_size=1,
     dataset=dict(
@@ -329,13 +315,11 @@ val_evaluator = dict(
     ], type='IoUMetric')
 vis_backends = [
     dict(type='LocalVisBackend'),
-    dict(type='TensorboardVisBackend'),
 ]
 visualizer = dict(
     name='visualizer',
     type='SegLocalVisualizer',
     vis_backends=[
         dict(type='LocalVisBackend'),
-        dict(type='TensorboardVisBackend'),
     ])
 work_dir = 'work_dirs/domain_adaptation/experiment3/stage1_mapillary'
