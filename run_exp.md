@@ -1,10 +1,14 @@
 # Domain Adaptation Experiments
 
-All experiments now support:
-- **Extended training**: Up to 320k iterations (auto-stops when converged)
-- **Early stopping**: Stops if no 0.2% mIoU improvement for 48k iterations
-- **Best model saving**: Automatically saves checkpoint with highest mIoU
-- **TensorBoard logging**: Full visualization support
+All experiments now optimized with:
+- **AMP Training**: Automatic Mixed Precision for faster training
+- **Gradient Accumulation**: Effective batch size ~8 (lr=6e-5)
+- **SyncBN**: Better batch normalization across GPUs
+- **ImageNet Normalization**: RGB mean/std with bgr_to_rgb=True
+- **Proper Augmentations**: RandomResize (0.5-2.0), RandomCrop, RandomFlip, PhotoMetricDistortion
+- **Best Model Saving**: Automatically saves checkpoint with highest mIoU
+- **TensorBoard Logging**: Full visualization support
+- **TTA Support**: Optional test-time augmentation for extra mIoU (multi-scale + flip)
 
 ## Experiment Overview
 
@@ -31,10 +35,10 @@ python tools/train.py configs/domain_adaptation/experiment1_stage1_mapillary.py 
 
 ### Stage 2: Fine-tune on RailSem19 (19 classes)
 ```bash
-# First, update the checkpoint path in experiment1_mapillary_to_railsem19.py with the best checkpoint from Stage 1
-# Then run:
+# Use the best checkpoint from Stage 1
 python tools/train.py configs/domain_adaptation/experiment1_mapillary_to_railsem19.py \
-    --work-dir work_dirs/domain_adaptation/experiment1/stage2_railsem19
+    --work-dir work_dirs/domain_adaptation/experiment1/stage2_railsem19 \
+    --cfg-options load_from=work_dirs/domain_adaptation/experiment1/stage1_mapillary/best_mIoU_iter_*.pth
 ```
 
 ## Experiment 2: Cityscapes → RailSem19
@@ -47,10 +51,10 @@ python tools/train.py configs/domain_adaptation/experiment2_stage1_cityscapes.py
 
 ### Stage 2: Fine-tune on RailSem19 (19 classes)
 ```bash
-# First, update the checkpoint path in experiment2_cityscapes_to_railsem19.py with the best checkpoint from Stage 1
-# Then run:
+# Use the best checkpoint from Stage 1
 python tools/train.py configs/domain_adaptation/experiment2_cityscapes_to_railsem19.py \
-    --work-dir work_dirs/domain_adaptation/experiment2/stage2_railsem19
+    --work-dir work_dirs/domain_adaptation/experiment2/stage2_railsem19 \
+    --cfg-options load_from=work_dirs/domain_adaptation/experiment2/stage1_cityscapes/best_mIoU_iter_*.pth
 ```
 
 ## Experiment 3: Mapillary → Cityscapes → RailSem19
@@ -81,55 +85,55 @@ python tools/train.py configs/domain_adaptation/experiment3_stage3_railsem19.py 
 
 ## Resume/Continue Training from Existing Checkpoints
 
-If you want to continue training from where you left off (e.g., from 160k to convergence):
+If you want to continue training from a specific checkpoint:
 
 ### Experiment 1 - Stage 1
 ```bash
 python tools/train.py configs/domain_adaptation/experiment1_stage1_mapillary.py \
     --work-dir work_dirs/domain_adaptation/experiment1/stage1_mapillary \
-    --cfg-options load_from=work_dirs/domain_adaptation/experiment1/stage1_mapillary/iter_160000.pth
+    --resume
 ```
 
 ### Experiment 1 - Stage 2
 ```bash
 python tools/train.py configs/domain_adaptation/experiment1_mapillary_to_railsem19.py \
     --work-dir work_dirs/domain_adaptation/experiment1/stage2_railsem19 \
-    --cfg-options load_from=work_dirs/domain_adaptation/experiment1/stage2_railsem19/iter_160000.pth
+    --resume
 ```
 
 ### Experiment 2 - Stage 1
 ```bash
 python tools/train.py configs/domain_adaptation/experiment2_stage1_cityscapes.py \
     --work-dir work_dirs/domain_adaptation/experiment2/stage1_cityscapes \
-    --cfg-options load_from=work_dirs/domain_adaptation/experiment2/stage1_cityscapes/iter_160000.pth
+    --resume
 ```
 
 ### Experiment 2 - Stage 2
 ```bash
 python tools/train.py configs/domain_adaptation/experiment2_cityscapes_to_railsem19.py \
     --work-dir work_dirs/domain_adaptation/experiment2/stage2_railsem19 \
-    --cfg-options load_from=work_dirs/domain_adaptation/experiment2/stage2_railsem19/iter_160000.pth
+    --resume
 ```
 
 ### Experiment 3 - Stage 1
 ```bash
 python tools/train.py configs/domain_adaptation/experiment3_stage1_mapillary.py \
     --work-dir work_dirs/domain_adaptation/experiment3/stage1_mapillary \
-    --cfg-options load_from=work_dirs/domain_adaptation/experiment3/stage1_mapillary/iter_160000.pth
+    --resume
 ```
 
 ### Experiment 3 - Stage 2
 ```bash
 python tools/train.py configs/domain_adaptation/experiment3_stage2_cityscapes.py \
     --work-dir work_dirs/domain_adaptation/experiment3/stage2_cityscapes \
-    --cfg-options load_from=work_dirs/domain_adaptation/experiment3/stage2_cityscapes/iter_160000.pth
+    --resume
 ```
 
 ### Experiment 3 - Stage 3
 ```bash
 python tools/train.py configs/domain_adaptation/experiment3_stage3_railsem19.py \
     --work-dir work_dirs/domain_adaptation/experiment3/stage3_railsem19 \
-    --cfg-options load_from=work_dirs/domain_adaptation/experiment3/stage3_railsem19/iter_160000.pth
+    --resume
 ```
 
 ---

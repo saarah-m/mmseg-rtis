@@ -123,3 +123,6 @@ mmseg/.mim
 *.json
 !**/config*.py
 !**/experiment*.py
+
+
+work_dirs/

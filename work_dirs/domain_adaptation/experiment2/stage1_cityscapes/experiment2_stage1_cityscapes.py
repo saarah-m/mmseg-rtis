@@ -3,14 +3,6 @@ crop_size = (
     1024,
     1024,
 )
-custom_hooks = [
-    dict(
-        min_delta=0.2,
-        monitor='mIoU',
-        patience=3,
-        rule='greater',
-        type='EarlyStoppingHook'),
-]
 data_preprocessor = dict(
     bgr_to_rgb=True,
     mean=[
@@ -36,8 +28,8 @@ dataset_type = 'CityscapesDataset'
 default_hooks = dict(
     checkpoint=dict(
         by_epoch=False,
-        interval=16000,
-        max_keep_ckpts=5,
+        interval=8000,
+        max_keep_ckpts=3,
         rule='greater',
         save_best='mIoU',
         type='CheckpointHook'),
@@ -162,6 +154,7 @@ model = dict(
     type='EncoderDecoder')
 norm_cfg = dict(requires_grad=True, type='SyncBN')
 optim_wrapper = dict(
+    accumulative_counts=8,
     optimizer=dict(
         betas=(
             0.9,
@@ -172,7 +165,7 @@ optim_wrapper = dict(
             head=dict(lr_mult=10.0),
             norm=dict(decay_mult=0.0),
             pos_block=dict(decay_mult=0.0))),
-    type='OptimWrapper')
+    type='AmpOptimWrapper')
 optimizer = dict(lr=0.01, momentum=0.9, type='SGD', weight_decay=0.0005)
 param_scheduler = [
     dict(
@@ -181,7 +174,7 @@ param_scheduler = [
     dict(
         begin=1500,
         by_epoch=False,
-        end=320000,
+        end=160000,
         eta_min=0.0,
         power=1.0,
         type='PolyLR'),
@@ -221,7 +214,7 @@ test_pipeline = [
     dict(type='PackSegInputs'),
 ]
 train_cfg = dict(
-    max_iters=320000, type='IterBasedTrainLoop', val_interval=16000)
+    max_iters=160000, type='IterBasedTrainLoop', val_interval=8000)
 train_dataloader = dict(
     batch_size=1,
     dataset=dict(
@@ -285,19 +278,16 @@ tta_pipeline = [
     dict(
         transforms=[
             [
-                dict(keep_ratio=True, scale_factor=0.5, type='Resize'),
                 dict(keep_ratio=True, scale_factor=0.75, type='Resize'),
                 dict(keep_ratio=True, scale_factor=1.0, type='Resize'),
                 dict(keep_ratio=True, scale_factor=1.25, type='Resize'),
-                dict(keep_ratio=True, scale_factor=1.5, type='Resize'),
-                dict(keep_ratio=True, scale_factor=1.75, type='Resize'),
             ],
             [
-                dict(direction='horizontal', prob=0.0, type='RandomFlip'),
-                dict(direction='horizontal', prob=1.0, type='RandomFlip'),
+                dict(prob=0.0, type='RandomFlip'),
+                dict(prob=1.0, type='RandomFlip'),
             ],
             [
-                dict(type='LoadAnnotations'),
+                dict(reduce_zero_label=True, type='LoadAnnotations'),
             ],
             [
                 dict(type='PackSegInputs'),
