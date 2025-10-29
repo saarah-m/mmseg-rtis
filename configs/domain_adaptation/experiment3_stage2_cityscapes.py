@@ -55,7 +55,7 @@ tta_pipeline = [
             [dict(type='Resize', scale_factor=s, keep_ratio=True)
              for s in [0.75, 1.0, 1.25]],
             [dict(type='RandomFlip', prob=0.0), dict(type='RandomFlip', prob=1.0)],
-            [dict(type='LoadAnnotations', reduce_zero_label=True)],  # Cityscapes uses reduce_zero_label=True
+            # Remove LoadAnnotations from TTA - not needed for inference
             [dict(type='PackSegInputs')]
         ])
 ]
