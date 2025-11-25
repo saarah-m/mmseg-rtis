@@ -287,9 +287,6 @@ tta_pipeline = [
                 dict(prob=1.0, type='RandomFlip'),
             ],
             [
-                dict(reduce_zero_label=True, type='LoadAnnotations'),
-            ],
-            [
                 dict(type='PackSegInputs'),
             ],
         ],
