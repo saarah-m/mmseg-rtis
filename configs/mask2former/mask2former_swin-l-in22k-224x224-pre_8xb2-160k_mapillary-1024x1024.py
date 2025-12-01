@@ -63,7 +63,7 @@ model = dict(
                         num_heads=8,
                         num_levels=3,
                         num_points=4,
-                        im2col_step=64,
+                        im2col_step=32,  # Reduced from 64 to save memory
                         dropout=0.0,
                         batch_first=True,
                         norm_cfg=None,
@@ -111,9 +111,9 @@ model = dict(
         loss_cls=dict(
             type='mmdet.CrossEntropyLoss',
             use_sigmoid=False,
-            reduction='mean',
             loss_weight=2.0,
-            class_weight='dataset'),  # Auto-compute frequency-based weights
+            reduction='mean',
+            class_weight=[1.0] * num_classes + [0.1]),
         loss_mask=dict(
             type='mmdet.CrossEntropyLoss',
             use_sigmoid=True,
@@ -128,7 +128,7 @@ model = dict(
             eps=1.0,
             loss_weight=5.0),
         train_cfg=dict(
-            num_points=12544,
+            num_points=11264,  # Reduced from 12544 to save memory
             oversample_ratio=3.0,
             importance_sample_ratio=0.75,
             assigner=dict(
@@ -149,26 +149,17 @@ model = dict(
     train_cfg=dict(),
     test_cfg=dict(mode='whole'))
 
-# dataset config with improved augmentation
+# dataset config
 train_pipeline = [
     dict(type='LoadImageFromFile'),
     dict(type='LoadAnnotations', reduce_zero_label=False),
     dict(
         type='RandomChoiceResize',
-        scales=[512, 614, 716, 819, 921, 1024, 1126, 1228, 1331, 1433, 1536, 1638, 1740, 1843, 1945, 2048],
+        scales=[int(x * 0.1 * 1024) for x in range(5, 21)],
         resize_type='ResizeShortestEdge',
         max_size=4096),
     dict(type='RandomCrop', crop_size=crop_size, cat_max_ratio=0.75),
     dict(type='RandomFlip', prob=0.5),
-    dict(
-        type='Albu',
-        transforms=[
-            dict(
-                type='RandomBrightnessContrast',
-                brightness_limit=0.2,
-                contrast_limit=0.2,
-                p=0.5),
-        ]),
     dict(type='PhotoMetricDistortion'),
     dict(type='PackSegInputs')
 ]
@@ -181,7 +172,8 @@ test_pipeline = [
 ]
 
 train_dataloader = dict(
-    batch_size=2,
+    batch_size=1,
+    num_workers=2,
     dataset=dict(
         reduce_zero_label=False,
         pipeline=train_pipeline
@@ -198,42 +190,50 @@ val_dataloader = dict(
 
 test_dataloader = val_dataloader
 
-# Optimizer with AMP for better performance
+# set all layers in backbone to lr_mult=0.1
+# set all norm layers, position_embeding,
+# query_embeding, level_embeding to decay_multi=0.0
+depths = [2, 2, 18, 2]
+backbone_norm_multi = dict(lr_mult=0.1, decay_mult=0.0)
+backbone_embed_multi = dict(lr_mult=0.1, decay_mult=0.0)
+embed_multi = dict(lr_mult=1.0, decay_mult=0.0)
+custom_keys = {
+    'backbone': dict(lr_mult=0.1, decay_mult=1.0),
+    'backbone.patch_embed.norm': backbone_norm_multi,
+    'backbone.norm': backbone_norm_multi,
+    'absolute_pos_embed': backbone_embed_multi,
+    'relative_position_bias_table': backbone_embed_multi,
+    'query_embed': embed_multi,
+    'query_feat': embed_multi,
+    'level_embed': embed_multi
+}
+custom_keys.update({
+    f'backbone.stages.{stage_id}.blocks.{block_id}.norm': backbone_norm_multi
+    for stage_id, num_blocks in enumerate(depths)
+    for block_id in range(num_blocks)
+})
+custom_keys.update({
+    f'backbone.stages.{stage_id}.downsample.norm': backbone_norm_multi
+    for stage_id in range(len(depths) - 1)
+})
+# optimizer
+optimizer = dict(
+    type='AdamW', lr=0.0001, weight_decay=0.05, eps=1e-8, betas=(0.9, 0.999))
 optim_wrapper = dict(
-    type='AmpOptimWrapper',
-    loss_scale='dynamic',
-    optimizer=dict(
-        type='AdamW',
-        lr=6e-5,
-        betas=(0.9, 0.999),
-        weight_decay=0.05),
-    paramwise_cfg=dict(
-        custom_keys=dict(
-            backbone=dict(lr_mult=0.1, decay_mult=1.0),
-            norm=dict(decay_mult=0.0),
-            pos_block=dict(decay_mult=0.0),
-            head=dict(lr_mult=1.0),
-            level_embed=dict(decay_mult=0.0, lr_mult=1.0),
-            query_embed=dict(decay_mult=0.0, lr_mult=1.0),
-            query_feat=dict(decay_mult=0.0, lr_mult=1.0)),
-        norm_decay_mult=0.0),
-    clip_grad=dict(max_norm=0.01, norm_type=2))
+    type='OptimWrapper',
+    optimizer=optimizer,
+    clip_grad=dict(max_norm=0.01, norm_type=2),
+    paramwise_cfg=dict(custom_keys=custom_keys, norm_decay_mult=0.0))
 
-# Learning policy with warmup
+# learning policy
 param_scheduler = [
-    dict(
-        type='LinearLR',
-        start_factor=1e-3,
-        by_epoch=False,
-        begin=0,
-        end=1500),
     dict(
         type='PolyLR',
         eta_min=0,
         power=0.9,
-        by_epoch=False,
-        begin=1500,
-        end=160000),
+        begin=0,
+        end=160000,
+        by_epoch=False)
 ]
 
 # training schedule for 160k iterations
@@ -246,40 +246,13 @@ default_hooks = dict(
     param_scheduler=dict(type='ParamSchedulerHook'),
     checkpoint=dict(
         type='CheckpointHook', by_epoch=False, interval=5000,
-        save_best='mIoU', max_keep_ckpts=3),
+        save_best='mIoU'),
     sampler_seed=dict(type='DistSamplerSeedHook'),
     visualization=dict(type='SegVisualizationHook'))
 
 # Default setting for scaling LR automatically
+#   - `enable` means enable scaling LR automatically
+#       or not by default.
+#   - `base_batch_size` = (8 GPUs) x (2 samples per GPU).
 auto_scale_lr = dict(enable=False, base_batch_size=16)
-
-# Enable TensorBoard visualization
-vis_backends = [dict(type='LocalVisBackend'), dict(type='TensorboardVisBackend')]
-visualizer = dict(
-    type='SegLocalVisualizer', vis_backends=vis_backends, name='visualizer')
-
-# TTA configuration
-tta_model = dict(type='SegTTAModel')
-tta_pipeline = [
-    dict(type='LoadImageFromFile', backend_args=None),
-    dict(
-        type='TestTimeAug',
-        transforms=[
-            [
-                dict(type='Resize', scale_factor=r, keep_ratio=True)
-                for r in [0.5, 0.75, 1.0, 1.25, 1.5, 1.75]
-            ],
-            [
-                dict(type='RandomFlip', prob=0.0, direction='horizontal'),
-                dict(type='RandomFlip', prob=1.0, direction='horizontal')
-            ],
-            [dict(type='LoadAnnotations', reduce_zero_label=False)],
-            [dict(type='PackSegInputs')]
-        ])
-]
-
-# Experiment metadata
-experiment_name = 'mask2former_swin-l_mapillary_from_scratch'
-source_dataset = 'mapillary'
-target_dataset = 'mapillary'
 
