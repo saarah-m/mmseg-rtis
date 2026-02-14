@@ -44,8 +44,10 @@ train_dataloader = dict(
         type=dataset_type,
         data_root=data_root,
         data_prefix=dict(
-            img_path="rs19_4000/train_images", seg_map_path="rs19_4000/train_masks"
+            img_path="train/images", seg_map_path="train/annotations"
         ),
+        img_suffix=".jpg",
+        seg_map_suffix=".png",
         pipeline=train_pipeline,
     ),
 )
@@ -58,9 +60,11 @@ val_dataloader = dict(
         type=dataset_type,
         data_root=data_root,
         data_prefix=dict(
-            img_path="rs19_4000/validation_images",
-            seg_map_path="rs19_4000/validation_masks",
+            img_path="val/images",
+            seg_map_path="val/annotations",
         ),
+        img_suffix=".jpg",
+        seg_map_suffix=".png",
         pipeline=test_pipeline,
     ),
 )
