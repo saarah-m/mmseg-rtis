@@ -121,8 +121,5 @@ mmseg/.mim
 *.ckpt
 *.log
 *.json
-!**/config*.py
-!**/experiment*.py
-
 
 work_dirs/
