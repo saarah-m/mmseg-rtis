@@ -1,4 +1,4 @@
-_base_ = ['./segformer_mit-b5_8xb1-160k_cityscapes-1024x1024.py']
+_base_ = ['./mask2former_swin-l-in22k-384x384-pre_8xb2-90k_cityscapes-512x1024.py']
 dataset_type = 'RailSem19Dataset'
 data_root = 'data/RailSem19/'
 train_dataloader = dict(
@@ -26,7 +26,7 @@ test_dataloader = dict(
 vis_backends = [dict(type='LocalVisBackend'), dict(type='TensorboardVisBackend')]
 visualizer = dict(type='SegLocalVisualizer', vis_backends=vis_backends, name='visualizer')
 
-load_from = 'https://download.openmmlab.com/mmsegmentation/v0.5/segformer/segformer_mit-b5_8x1_1024x1024_160k_cityscapes/segformer_mit-b5_8x1_1024x1024_160k_cityscapes_20211206_072934-87a052ec.pth'
+load_from = 'https://download.openmmlab.com/mmsegmentation/v0.5/mask2former/mask2former_swin-l-in22k-384x384-pre_8xb2-90k_cityscapes-512x1024/mask2former_swin-l-in22k-384x384-pre_8xb2-90k_cityscapes-512x1024_20221202_141901-28ad20f1.pth'
 
 
 optimizer = dict(type='SGD', lr=0.00125, momentum=0.9, weight_decay=0.0005)

@@ -1,4 +1,4 @@
-_base_ = ['./segformer_mit-b5_8xb1-160k_cityscapes-1024x1024.py']
+_base_ = ['./pspnet_r101-d8_4xb2-80k_cityscapes-512x1024.py']
 dataset_type = 'RailSem19Dataset'
 data_root = 'data/RailSem19/'
 train_dataloader = dict(
@@ -26,9 +26,10 @@ test_dataloader = dict(
 vis_backends = [dict(type='LocalVisBackend'), dict(type='TensorboardVisBackend')]
 visualizer = dict(type='SegLocalVisualizer', vis_backends=vis_backends, name='visualizer')
 
-load_from = 'https://download.openmmlab.com/mmsegmentation/v0.5/segformer/segformer_mit-b5_8x1_1024x1024_160k_cityscapes/segformer_mit-b5_8x1_1024x1024_160k_cityscapes_20211206_072934-87a052ec.pth'
+load_from = 'https://download.openmmlab.com/mmsegmentation/v0.5/pspnet/pspnet_r101-d8_512x1024_80k_cityscapes/pspnet_r101-d8_512x1024_80k_cityscapes_20200606_112211-e1e1100f.pth'
 
 
 optimizer = dict(type='SGD', lr=0.00125, momentum=0.9, weight_decay=0.0005)
 optim_wrapper = dict(type='OptimWrapper', optimizer=optimizer, clip_grad=None)
 
+model = dict(backbone=dict(norm_eval=True))

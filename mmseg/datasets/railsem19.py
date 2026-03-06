@@ -1,56 +1,29 @@
-import os.path as osp
-import json
-from typing import List
-
-import numpy as np
-from mmengine.fileio import get_file_backend
+# Copyright (c) OpenMMLab. All rights reserved.
 from mmseg.registry import DATASETS
-from mmseg.datasets import BaseSegDataset
+from .basesegdataset import BaseSegDataset
 
 
 @DATASETS.register_module()
 class RailSem19Dataset(BaseSegDataset):
-    """RailSem19 dataset with 19 classes and color palette from rs19-config.json."""
+    """RailSem19 dataset.
 
-    # Path to the dataset root
-    data_root = "data/RailSem19/"
-    cfg_path = osp.join(data_root, "rs19-config.json")
+    The ``img_suffix`` is fixed to '.jpg' and ``seg_map_suffix`` is fixed to '.png'.
+    """
+    METAINFO = dict(
+        classes=('road', 'sidewalk', 'construction', 'tram-track', 'fence',
+                 'pole', 'traffic-light', 'traffic-sign', 'vegetation',
+                 'terrain', 'sky', 'human', 'rail-track', 'car', 'truck',
+                 'trackbed', 'on-rails', 'rail-raised', 'rail-embedded'),
+        palette=[[128, 64, 128], [244, 35, 232], [70, 70, 70], [192, 0, 128],
+                 [190, 153, 153], [153, 153, 153], [250, 170, 30],
+                 [220, 220, 0], [107, 142, 35], [152, 251, 152],
+                 [70, 130, 180], [220, 20, 60], [230, 150, 140], [0, 0, 142],
+                 [0, 0, 70], [90, 40, 40], [0, 80, 100], [0, 254, 254],
+                 [0, 68, 63]])
 
-    # Load class names and palette from JSON
-    with open(cfg_path, "r") as f:
-        json_data = json.load(f)
-        METAINFO = {
-            "classes": [item["name"] for item in json_data["labels"]],
-            "palette": [tuple(item["color"]) for item in json_data["labels"]],
-        }
-
-    def __init__(self, img_suffix=".jpg", seg_map_suffix=".png", **kwargs) -> None:
+    def __init__(self,
+                 img_suffix='.jpg',
+                 seg_map_suffix='.png',
+                 **kwargs) -> None:
         super().__init__(
-            img_suffix=img_suffix,
-            seg_map_suffix=seg_map_suffix,
-            reduce_zero_label=False,
-            **kwargs,
-        )
-
-    def load_data_list(self) -> List[dict]:
-        data_list = []
-        img_dir = self.data_prefix.get("img_path")
-        ann_dir = self.data_prefix.get("seg_map_path")
-        file_backend = get_file_backend(img_dir)
-
-        for img_name in file_backend.list_dir_or_file(
-            dir_path=img_dir, list_dir=False, suffix=self.img_suffix, recursive=True
-        ):
-            data_info = dict(
-                img_path=osp.join(img_dir, img_name),
-                seg_map_path=osp.join(
-                    ann_dir, img_name.replace(self.img_suffix, self.seg_map_suffix)
-                ),
-            )
-            data_info["reduce_zero_label"] = self.reduce_zero_label
-            data_info["seg_fields"] = []
-            data_list.append(data_info)
-
-        data_list = sorted(data_list, key=lambda x: x["img_path"])
-        return data_list
-
+            img_suffix=img_suffix, seg_map_suffix=seg_map_suffix, **kwargs)
