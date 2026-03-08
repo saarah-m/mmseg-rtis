@@ -28,8 +28,5 @@ visualizer = dict(type='SegLocalVisualizer', vis_backends=vis_backends, name='vi
 
 load_from = 'https://download.openmmlab.com/mmsegmentation/v0.5/pspnet/pspnet_r101-d8_512x1024_80k_cityscapes/pspnet_r101-d8_512x1024_80k_cityscapes_20200606_112211-e1e1100f.pth'
 
-
 optimizer = dict(type='SGD', lr=0.00125, momentum=0.9, weight_decay=0.0005)
 optim_wrapper = dict(type='OptimWrapper', optimizer=optimizer, clip_grad=None)
-
-model = dict(backbone=dict(norm_eval=True))

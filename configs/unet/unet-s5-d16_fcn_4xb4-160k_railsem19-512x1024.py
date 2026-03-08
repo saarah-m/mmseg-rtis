@@ -1,6 +1,3 @@
-import warnings
-warnings.filterwarnings("ignore", message="Detected call of `scheduler.step\(\)` before `optimizer.step\(\)`")
-
 _base_ = ['./unet-s5-d16_fcn_4xb4-160k_cityscapes-512x1024.py']
 dataset_type = 'RailSem19Dataset'
 data_root = 'data/RailSem19/'
@@ -32,10 +29,9 @@ visualizer = dict(type='SegLocalVisualizer', vis_backends=vis_backends, name='vi
 
 load_from = 'https://download.openmmlab.com/mmsegmentation/v0.5/unet/fcn_unet_s5-d16_4x4_512x1024_160k_cityscapes/fcn_unet_s5-d16_4x4_512x1024_160k_cityscapes_20211210_145204-6860854e.pth'
 
-
 optimizer = dict(type='SGD', lr=0.01, momentum=0.9, weight_decay=0.0005)
 optim_wrapper = dict(
-    type='AmpOptimWrapper',
+    type='OptimWrapper',
     optimizer=optimizer,
     accumulative_counts=8,
     clip_grad=None)
@@ -53,4 +49,4 @@ param_scheduler = [
 default_hooks = dict(
     checkpoint=dict(type='CheckpointHook', by_epoch=False, interval=128000))
 
-model = dict(backbone=dict(with_cp=True, norm_eval=True))
+model = dict(backbone=dict(with_cp=True))

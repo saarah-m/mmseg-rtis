@@ -28,7 +28,3 @@ visualizer = dict(type='SegLocalVisualizer', vis_backends=vis_backends, name='vi
 
 load_from = 'https://download.openmmlab.com/mmsegmentation/v0.5/mask2former/mask2former_swin-l-in22k-384x384-pre_8xb2-90k_cityscapes-512x1024/mask2former_swin-l-in22k-384x384-pre_8xb2-90k_cityscapes-512x1024_20221202_141901-28ad20f1.pth'
 
-
-optimizer = dict(type='SGD', lr=0.00125, momentum=0.9, weight_decay=0.0005)
-optim_wrapper = dict(type='OptimWrapper', optimizer=optimizer, clip_grad=None)
-

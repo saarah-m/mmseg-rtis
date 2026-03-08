@@ -30,5 +30,3 @@ load_from = 'https://download.openmmlab.com/mmsegmentation/v0.5/deeplabv3plus/de
 
 optimizer = dict(type='SGD', lr=0.00125, momentum=0.9, weight_decay=0.0005)
 optim_wrapper = dict(type='OptimWrapper', optimizer=optimizer, clip_grad=None)
-
-model = dict(backbone=dict(norm_eval=True))

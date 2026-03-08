@@ -28,7 +28,3 @@ visualizer = dict(type='SegLocalVisualizer', vis_backends=vis_backends, name='vi
 
 load_from = 'https://download.openmmlab.com/mmsegmentation/v0.5/segformer/segformer_mit-b5_8x1_1024x1024_160k_cityscapes/segformer_mit-b5_8x1_1024x1024_160k_cityscapes_20211206_072934-87a052ec.pth'
 
-
-optimizer = dict(type='SGD', lr=0.00125, momentum=0.9, weight_decay=0.0005)
-optim_wrapper = dict(type='OptimWrapper', optimizer=optimizer, clip_grad=None)
-

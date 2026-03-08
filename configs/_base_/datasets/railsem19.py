@@ -48,7 +48,7 @@ train_dataloader = dict(
         type=dataset_type,
         data_root=data_root,
         data_prefix=dict(
-            img_path='jpgs/rs19_val', seg_map_path='uint8/rs19_val'),
+            img_path='rs19_4000/train_images', seg_map_path='rs19_4000/train_masks'),
         pipeline=train_pipeline))
 val_dataloader = dict(
     batch_size=1,
@@ -59,7 +59,7 @@ val_dataloader = dict(
         type=dataset_type,
         data_root=data_root,
         data_prefix=dict(
-            img_path='jpgs/rs19_val', seg_map_path='uint8/rs19_val'),
+            img_path='rs19_4000/validation_images', seg_map_path='rs19_4000/validation_masks'),
         pipeline=test_pipeline))
 test_dataloader = val_dataloader
 

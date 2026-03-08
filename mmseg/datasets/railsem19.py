@@ -26,4 +26,4 @@ class RailSem19Dataset(BaseSegDataset):
                  seg_map_suffix='.png',
                  **kwargs) -> None:
         super().__init__(
-            img_suffix=img_suffix, seg_map_suffix=seg_map_suffix, **kwargs)
+            img_suffix=img_suffix, seg_map_suffix=seg_map_suffix, reduce_zero_label=False, **kwargs)
