@@ -75,7 +75,7 @@ def get_best_checkpoint(work_dir: Path) -> Optional[Path]:
 
 
 def model_short_name(work_dir_name: str) -> str:
-    """e.g. 'deeplabv3plus_r101-d8_4xb2-80k_railsem19-512x1024' -> 'deeplabv3plus'"""
+    """e.g. 'deeplabv3plus_r101-d8_4xb2-80k_railsem19-540x960' -> 'deeplabv3plus'"""
     return work_dir_name.split("_")[0]
 
 
