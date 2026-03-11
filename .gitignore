@@ -123,3 +123,4 @@ mmseg/.mim
 *.json
 
 work_dirs/
+inference_comparison
