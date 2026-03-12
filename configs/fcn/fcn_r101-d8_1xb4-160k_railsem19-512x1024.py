@@ -1,21 +1,15 @@
-_base_ = ['./mask2former_swin-l-in22k-384x384-pre_8xb2-90k_cityscapes-512x1024.py']
+_base_ = ['./fcn_r101-d8_4xb2-80k_cityscapes-512x1024.py']
 dataset_type = 'RailSem19Dataset'
 data_root = 'data/RailSem19/'
 crop_size = (512, 1024)
-data_preprocessor = dict(size=crop_size)
-model = dict(
-    data_preprocessor=data_preprocessor,
-    decode_head=dict(num_classes=19))
-# Shortest-edge scales capped at 1080 (original short edge of RailSem19 images)
-# to avoid upscaling; max_size=1920 matches original long edge
 train_pipeline = [
     dict(type='LoadImageFromFile'),
     dict(type='LoadAnnotations'),
     dict(
-        type='RandomChoiceResize',
-        scales=[540, 648, 756, 864, 972, 1080],
-        resize_type='ResizeShortestEdge',
-        max_size=1920),
+        type='RandomResize',
+        scale=(1920, 1080),
+        ratio_range=(0.5, 1.0),
+        keep_ratio=True),
     dict(type='RandomCrop', crop_size=crop_size, cat_max_ratio=0.75),
     dict(type='RandomFlip', prob=0.5),
     dict(type='PhotoMetricDistortion'),
@@ -28,8 +22,8 @@ test_pipeline = [
     dict(type='PackSegInputs')
 ]
 train_dataloader = dict(
-    batch_size=8,
-    num_workers=4,
+    batch_size=4,
+    num_workers=2,
     dataset=dict(
         type=dataset_type,
         data_root=data_root,
@@ -57,9 +51,21 @@ test_dataloader = dict(
 vis_backends = [dict(type='LocalVisBackend'), dict(type='TensorboardVisBackend')]
 visualizer = dict(type='SegLocalVisualizer', vis_backends=vis_backends, name='visualizer')
 
-load_from = 'https://download.openmmlab.com/mmsegmentation/v0.5/mask2former/mask2former_swin-l-in22k-384x384-pre_8xb2-90k_cityscapes-512x1024/mask2former_swin-l-in22k-384x384-pre_8xb2-90k_cityscapes-512x1024_20221202_141901-28ad20f1.pth'
+load_from = 'https://download.openmmlab.com/mmsegmentation/v0.5/fcn/fcn_r101-d8_512x1024_80k_cityscapes/fcn_r101-d8_512x1024_80k_cityscapes_20200606_113038-3fb937eb.pth'
 
-# Slower convergence: 160k iterations (transformer model)
+# Batch size reduced: batch_size=4, 160k iterations, lr=0.005 (halved for smaller batch)
+optimizer = dict(type='SGD', lr=0.005, momentum=0.9, weight_decay=0.0005)
+optim_wrapper = dict(type='OptimWrapper', optimizer=optimizer, clip_grad=None)
+
 train_cfg = dict(type='IterBasedTrainLoop', max_iters=160000, val_interval=8000)
+param_scheduler = [
+    dict(
+        type='PolyLR',
+        eta_min=1e-4,
+        power=0.9,
+        begin=0,
+        end=160000,
+        by_epoch=False)
+]
 default_hooks = dict(
     checkpoint=dict(type='CheckpointHook', by_epoch=False, interval=8000))
