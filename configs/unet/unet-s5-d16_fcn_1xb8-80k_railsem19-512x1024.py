@@ -24,7 +24,7 @@ test_pipeline = [
     dict(type='PackSegInputs')
 ]
 train_dataloader = dict(
-    batch_size=4,
+    batch_size=8,
     num_workers=4,
     dataset=dict(
         type=dataset_type,
@@ -55,8 +55,8 @@ visualizer = dict(type='SegLocalVisualizer', vis_backends=vis_backends, name='vi
 
 load_from = 'https://download.openmmlab.com/mmsegmentation/v0.5/unet/fcn_unet_s5-d16_4x4_512x1024_160k_cityscapes/fcn_unet_s5-d16_4x4_512x1024_160k_cityscapes_20211210_145204-6860854e.pth'
 
-# lr scaled for batch_size=4 (was 0.01 for effective batch 16)
-optimizer = dict(type='SGD', lr=0.003, momentum=0.9, weight_decay=0.0005)
+# Standardized: batch_size=8, 80k iterations, lr=0.01 (Cityscapes default for batch 8)
+optimizer = dict(type='SGD', lr=0.01, momentum=0.9, weight_decay=0.0005)
 optim_wrapper = dict(type='OptimWrapper', optimizer=optimizer, clip_grad=None)
 
 train_cfg = dict(type='IterBasedTrainLoop', max_iters=80000, val_interval=8000)

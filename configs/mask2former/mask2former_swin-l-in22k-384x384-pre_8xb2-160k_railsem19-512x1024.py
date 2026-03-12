@@ -1,10 +1,11 @@
 _base_ = ['./mask2former_swin-l-in22k-384x384-pre_8xb2-90k_cityscapes-512x1024.py']
 dataset_type = 'RailSem19Dataset'
 data_root = 'data/RailSem19/'
-# crop_size fits comfortably within 1920x1080 at all scales below
 crop_size = (512, 1024)
 data_preprocessor = dict(size=crop_size)
-model = dict(data_preprocessor=data_preprocessor)
+model = dict(
+    data_preprocessor=data_preprocessor,
+    decode_head=dict(num_classes=19))
 # Shortest-edge scales capped at 1080 (original short edge of RailSem19 images)
 # to avoid upscaling; max_size=1920 matches original long edge
 train_pipeline = [
@@ -27,6 +28,8 @@ test_pipeline = [
     dict(type='PackSegInputs')
 ]
 train_dataloader = dict(
+    batch_size=8,
+    num_workers=4,
     dataset=dict(
         type=dataset_type,
         data_root=data_root,
@@ -56,3 +59,7 @@ visualizer = dict(type='SegLocalVisualizer', vis_backends=vis_backends, name='vi
 
 load_from = 'https://download.openmmlab.com/mmsegmentation/v0.5/mask2former/mask2former_swin-l-in22k-384x384-pre_8xb2-90k_cityscapes-512x1024/mask2former_swin-l-in22k-384x384-pre_8xb2-90k_cityscapes-512x1024_20221202_141901-28ad20f1.pth'
 
+# Slower convergence: 160k iterations (transformer model)
+train_cfg = dict(type='IterBasedTrainLoop', max_iters=160000, val_interval=8000)
+default_hooks = dict(
+    checkpoint=dict(type='CheckpointHook', by_epoch=False, interval=8000))

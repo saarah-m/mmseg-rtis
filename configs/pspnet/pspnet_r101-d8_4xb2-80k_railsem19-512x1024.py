@@ -22,6 +22,8 @@ test_pipeline = [
     dict(type='PackSegInputs')
 ]
 train_dataloader = dict(
+    batch_size=8,
+    num_workers=4,
     dataset=dict(
         type=dataset_type,
         data_root=data_root,
@@ -51,5 +53,19 @@ visualizer = dict(type='SegLocalVisualizer', vis_backends=vis_backends, name='vi
 
 load_from = 'https://download.openmmlab.com/mmsegmentation/v0.5/pspnet/pspnet_r101-d8_512x1024_80k_cityscapes/pspnet_r101-d8_512x1024_80k_cityscapes_20200606_112211-e1e1100f.pth'
 
-optimizer = dict(type='SGD', lr=0.00125, momentum=0.9, weight_decay=0.0005)
+# Standardized: batch_size=8, 80k iterations, lr=0.01 (Cityscapes default for batch 8)
+optimizer = dict(type='SGD', lr=0.01, momentum=0.9, weight_decay=0.0005)
 optim_wrapper = dict(type='OptimWrapper', optimizer=optimizer, clip_grad=None)
+
+train_cfg = dict(type='IterBasedTrainLoop', max_iters=80000, val_interval=8000)
+param_scheduler = [
+    dict(
+        type='PolyLR',
+        eta_min=1e-4,
+        power=0.9,
+        begin=0,
+        end=80000,
+        by_epoch=False)
+]
+default_hooks = dict(
+    checkpoint=dict(type='CheckpointHook', by_epoch=False, interval=8000))

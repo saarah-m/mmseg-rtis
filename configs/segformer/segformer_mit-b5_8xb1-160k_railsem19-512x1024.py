@@ -5,7 +5,8 @@ crop_size = (512, 1024)
 data_preprocessor = dict(size=crop_size)
 model = dict(
     data_preprocessor=data_preprocessor,
-    test_cfg=dict(mode='slide', crop_size=crop_size, stride=(405, 720)))
+    decode_head=dict(num_classes=19),
+    test_cfg=dict(mode='slide', crop_size=crop_size, stride=(384, 768)))
 train_pipeline = [
     dict(type='LoadImageFromFile'),
     dict(type='LoadAnnotations'),
@@ -26,6 +27,8 @@ test_pipeline = [
     dict(type='PackSegInputs')
 ]
 train_dataloader = dict(
+    batch_size=8,
+    num_workers=4,
     dataset=dict(
         type=dataset_type,
         data_root=data_root,
@@ -55,3 +58,7 @@ visualizer = dict(type='SegLocalVisualizer', vis_backends=vis_backends, name='vi
 
 load_from = 'https://download.openmmlab.com/mmsegmentation/v0.5/segformer/segformer_mit-b5_8x1_1024x1024_160k_cityscapes/segformer_mit-b5_8x1_1024x1024_160k_cityscapes_20211206_072934-87a052ec.pth'
 
+# Slower convergence: 160k iterations (transformer model)
+train_cfg = dict(type='IterBasedTrainLoop', max_iters=160000, val_interval=8000)
+default_hooks = dict(
+    checkpoint=dict(type='CheckpointHook', by_epoch=False, interval=8000))
