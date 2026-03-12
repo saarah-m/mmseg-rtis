@@ -8,15 +8,15 @@
 
 # Array of all 9 RailSem19 configuration files
 CONFIGS=(
-    "configs/deeplabv3plus/deeplabv3plus_r101-d8_4xb2-80k_railsem19-540x960.py"
+    "configs/deeplabv3plus/deeplabv3plus_r101-d8_4xb2-80k_railsem19-512x1024.py"
     "configs/mask2former/mask2former_swin-l-in22k-384x384-pre_8xb2-90k_railsem19-512x1024.py"
-    "configs/ocrnet/ocrnet_hr48_4xb2-160k_railsem19-540x960.py"
-    "configs/segformer/segformer_mit-b5_8xb1-160k_railsem19-540x960.py"
-    "configs/pspnet/pspnet_r101-d8_4xb2-80k_railsem19-540x960.py"
-    "configs/bisenetv2/bisenetv2_fcn_1xb20-128k_railsem19-540x960.py"
-    "configs/upernet/upernet_r101_4xb2-80k_railsem19-540x960.py"
-    "configs/fcn/fcn_r101-d8_4xb2-80k_railsem19-540x960.py"
-    "configs/unet/unet-s5-d16_fcn_1xb4-80k_railsem19-540x960.py"
+    "configs/ocrnet/ocrnet_hr48_4xb2-160k_railsem19-512x1024.py"
+    "configs/segformer/segformer_mit-b5_8xb1-160k_railsem19-512x1024.py"
+    "configs/pspnet/pspnet_r101-d8_4xb2-80k_railsem19-512x1024.py"
+    "configs/bisenetv2/bisenetv2_fcn_1xb20-128k_railsem19-512x1024.py"
+    "configs/upernet/upernet_r101_4xb2-80k_railsem19-512x1024.py"
+    "configs/fcn/fcn_r101-d8_4xb2-80k_railsem19-512x1024.py"
+    "configs/unet/unet-s5-d16_fcn_1xb4-80k_railsem19-512x1024.py"
 )
 
 # Get available GPUs from CUDA_VISIBLE_DEVICES or default to GPU 0

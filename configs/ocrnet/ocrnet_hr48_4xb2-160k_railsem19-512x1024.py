@@ -1,11 +1,7 @@
-_base_ = ['./segformer_mit-b5_8xb1-160k_cityscapes-1024x1024.py']
+_base_ = ['./ocrnet_hr48_4xb2-160k_cityscapes-512x1024.py']
 dataset_type = 'RailSem19Dataset'
 data_root = 'data/RailSem19/'
-crop_size = (540, 960)
-data_preprocessor = dict(size=crop_size)
-model = dict(
-    data_preprocessor=data_preprocessor,
-    test_cfg=dict(mode='slide', crop_size=crop_size, stride=(405, 720)))
+crop_size = (512, 1024)
 train_pipeline = [
     dict(type='LoadImageFromFile'),
     dict(type='LoadAnnotations'),
@@ -53,5 +49,7 @@ test_dataloader = dict(
 vis_backends = [dict(type='LocalVisBackend'), dict(type='TensorboardVisBackend')]
 visualizer = dict(type='SegLocalVisualizer', vis_backends=vis_backends, name='visualizer')
 
-load_from = 'https://download.openmmlab.com/mmsegmentation/v0.5/segformer/segformer_mit-b5_8x1_1024x1024_160k_cityscapes/segformer_mit-b5_8x1_1024x1024_160k_cityscapes_20211206_072934-87a052ec.pth'
+load_from = 'https://download.openmmlab.com/mmsegmentation/v0.5/ocrnet/ocrnet_hr48_512x1024_160k_cityscapes/ocrnet_hr48_512x1024_160k_cityscapes_20200602_191037-dfbf1b0c.pth'
 
+optimizer = dict(type='SGD', lr=0.00125, momentum=0.9, weight_decay=0.0005)
+optim_wrapper = dict(type='OptimWrapper', optimizer=optimizer, clip_grad=None)
