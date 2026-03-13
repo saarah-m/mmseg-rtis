@@ -1,7 +1,7 @@
 _base_ = ['./bisenetv2_fcn_4xb8-160k_cityscapes-1024x1024.py']
 dataset_type = 'RailSem19Dataset'
 data_root = 'data/RailSem19/'
-crop_size = (1024, 1024)
+crop_size = (1080, 1920)
 data_preprocessor = dict(size=crop_size)
 model = dict(
     data_preprocessor=data_preprocessor,
@@ -25,7 +25,7 @@ train_pipeline = [
     dict(type='LoadAnnotations'),
     dict(
         type='RandomChoiceResize',
-        scales=[(int(1080 * 0.5), int(1920 * 0.5)), (1080, 1920), (int(1080 * 2), int(1920 * 2))],
+        scales=[(540, 960), (1080, 1920), (2160, 3840)],
         resize_type='Resize',
         keep_ratio=True),
     dict(type='RandomCrop', crop_size=crop_size, cat_max_ratio=0.75),

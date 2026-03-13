@@ -1,7 +1,7 @@
 _base_ = ['./deeplabv3plus_r101-d8_4xb2-80k_cityscapes-512x1024.py']
 dataset_type = 'RailSem19Dataset'
 data_root = 'data/RailSem19/'
-crop_size = (1024, 1024)
+crop_size = (1080, 1920)
 train_pipeline = [
     dict(type='LoadImageFromFile'),
     dict(type='LoadAnnotations'),

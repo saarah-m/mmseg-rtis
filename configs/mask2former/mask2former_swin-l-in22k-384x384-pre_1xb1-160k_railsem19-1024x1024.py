@@ -1,7 +1,7 @@
 _base_ = ['./mask2former_swin-l-in22k-384x384-pre_8xb2-90k_cityscapes-512x1024.py']
 dataset_type = 'RailSem19Dataset'
 data_root = 'data/RailSem19/'
-crop_size = (1024, 1024)
+crop_size = (1080, 1920)
 data_preprocessor = dict(size=crop_size)
 model = dict(
     data_preprocessor=data_preprocessor,

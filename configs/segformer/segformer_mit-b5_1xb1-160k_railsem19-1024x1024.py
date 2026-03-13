@@ -1,13 +1,13 @@
 _base_ = ['./segformer_mit-b5_8xb1-160k_cityscapes-1024x1024.py']
 dataset_type = 'RailSem19Dataset'
 data_root = 'data/RailSem19/'
-crop_size = (1024, 1024)
+crop_size = (1080, 1920)
 data_preprocessor = dict(size=crop_size)
 model = dict(
     data_preprocessor=data_preprocessor,
     backbone=dict(with_cp=True),
     decode_head=dict(num_classes=19),
-    test_cfg=dict(mode='slide', crop_size=crop_size, stride=(768, 768)))
+    test_cfg=dict(mode='slide', crop_size=crop_size, stride=(1080, 1920)))
 train_pipeline = [
     dict(type='LoadImageFromFile'),
     dict(type='LoadAnnotations'),
