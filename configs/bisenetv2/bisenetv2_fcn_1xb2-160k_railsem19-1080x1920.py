@@ -30,7 +30,17 @@ train_pipeline = [
         keep_ratio=True),
     dict(type='RandomCrop', crop_size=crop_size, cat_max_ratio=0.75),
     dict(type='RandomFlip', prob=0.5),
-    dict(type='PhotoMetricDistortion'),
+    dict(type='GaussianBlur', sigma_range=(0.15, 1.3), prob=0.5),
+    dict(
+        type='Albu',
+        transforms=[
+            dict(
+                type='RandomBrightnessContrast',
+                brightness_limit=0.9,
+                contrast_limit=0.0,
+                p=0.5)
+        ],
+        keymap=dict(img='image', gt_seg_map='mask')),
     dict(type='PackSegInputs')
 ]
 test_pipeline = [

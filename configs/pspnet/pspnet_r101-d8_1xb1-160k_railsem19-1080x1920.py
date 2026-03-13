@@ -1,13 +1,7 @@
-_base_ = ['./segformer_mit-b5_8xb1-160k_cityscapes-1024x1024.py']
+_base_ = ['./pspnet_r101-d8_4xb2-80k_cityscapes-512x1024.py']
 dataset_type = 'RailSem19Dataset'
 data_root = 'data/RailSem19/'
 crop_size = (1080, 1920)
-data_preprocessor = dict(size=crop_size)
-model = dict(
-    data_preprocessor=data_preprocessor,
-    backbone=dict(with_cp=True),
-    decode_head=dict(num_classes=19),
-    test_cfg=dict(mode='slide', crop_size=crop_size, stride=(1080, 1920)))
 train_pipeline = [
     dict(type='LoadImageFromFile'),
     dict(type='LoadAnnotations'),
@@ -18,7 +12,17 @@ train_pipeline = [
         keep_ratio=True),
     dict(type='RandomCrop', crop_size=crop_size, cat_max_ratio=0.75),
     dict(type='RandomFlip', prob=0.5),
-    dict(type='PhotoMetricDistortion'),
+    dict(type='GaussianBlur', sigma_range=(0.15, 1.3), prob=0.5),
+    dict(
+        type='Albu',
+        transforms=[
+            dict(
+                type='RandomBrightnessContrast',
+                brightness_limit=0.9,
+                contrast_limit=0.0,
+                p=0.5)
+        ],
+        keymap=dict(img='image', gt_seg_map='mask')),
     dict(type='PackSegInputs')
 ]
 test_pipeline = [
@@ -56,18 +60,10 @@ test_dataloader = dict(
 vis_backends = [dict(type='LocalVisBackend'), dict(type='TensorboardVisBackend')]
 visualizer = dict(type='SegLocalVisualizer', vis_backends=vis_backends, name='visualizer')
 
-load_from = 'https://download.openmmlab.com/mmsegmentation/v0.5/segformer/segformer_mit-b5_8x1_1024x1024_160k_cityscapes/segformer_mit-b5_8x1_1024x1024_160k_cityscapes_20211206_072934-87a052ec.pth'
+load_from = 'https://download.openmmlab.com/mmsegmentation/v0.5/pspnet/pspnet_r101-d8_512x1024_80k_cityscapes/pspnet_r101-d8_512x1024_80k_cityscapes_20200606_112211-e1e1100f.pth'
 
-optim_wrapper = dict(
-    _delete_=True,
-    type='OptimWrapper',
-    optimizer=dict(type='AdamW', lr=0.00006, betas=(0.9, 0.999), weight_decay=0.01),
-    paramwise_cfg=dict(
-        custom_keys={
-            'pos_block': dict(decay_mult=0.),
-            'norm': dict(decay_mult=0.),
-            'head': dict(lr_mult=10.)
-        }))
+optimizer = dict(type='SGD', lr=0.0001, momentum=0.9, weight_decay=0.0001)
+optim_wrapper = dict(type='OptimWrapper', optimizer=optimizer, clip_grad=None)
 
 train_cfg = dict(type='IterBasedTrainLoop', max_iters=160000, val_interval=8000)
 param_scheduler = [

@@ -1,4 +1,4 @@
-_base_ = ['./fcn_r101-d8_4xb2-80k_cityscapes-512x1024.py']
+_base_ = ['./upernet_r101_4xb2-80k_cityscapes-512x1024.py']
 dataset_type = 'RailSem19Dataset'
 data_root = 'data/RailSem19/'
 crop_size = (1080, 1920)
@@ -12,7 +12,17 @@ train_pipeline = [
         keep_ratio=True),
     dict(type='RandomCrop', crop_size=crop_size, cat_max_ratio=0.75),
     dict(type='RandomFlip', prob=0.5),
-    dict(type='PhotoMetricDistortion'),
+    dict(type='GaussianBlur', sigma_range=(0.15, 1.3), prob=0.5),
+    dict(
+        type='Albu',
+        transforms=[
+            dict(
+                type='RandomBrightnessContrast',
+                brightness_limit=0.9,
+                contrast_limit=0.0,
+                p=0.5)
+        ],
+        keymap=dict(img='image', gt_seg_map='mask')),
     dict(type='PackSegInputs')
 ]
 test_pipeline = [
@@ -50,7 +60,7 @@ test_dataloader = dict(
 vis_backends = [dict(type='LocalVisBackend'), dict(type='TensorboardVisBackend')]
 visualizer = dict(type='SegLocalVisualizer', vis_backends=vis_backends, name='visualizer')
 
-load_from = 'https://download.openmmlab.com/mmsegmentation/v0.5/fcn/fcn_r101-d8_512x1024_80k_cityscapes/fcn_r101-d8_512x1024_80k_cityscapes_20200606_113038-3fb937eb.pth'
+load_from = 'https://download.openmmlab.com/mmsegmentation/v0.5/upernet/upernet_r101_512x1024_80k_cityscapes/upernet_r101_512x1024_80k_cityscapes_20200607_002403-f05f2345.pth'
 
 optimizer = dict(type='SGD', lr=0.0001, momentum=0.9, weight_decay=0.0001)
 optim_wrapper = dict(type='OptimWrapper', optimizer=optimizer, clip_grad=None)
