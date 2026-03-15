@@ -2434,8 +2434,14 @@ class Albu(BaseTransform):
                         results[key] = cv2.cvtColor(results[key],
                                                     cv2.COLOR_BGR2RGB)
 
-        # Apply Transform
-        results = self.aug(**results)
+        # Apply Transform - only pass relevant keys to albumentations
+        albu_keys = set(self.keymap_to_albu.values())
+        if self.additional_targets:
+            albu_keys.update(self.additional_targets.keys())
+        albu_input = {k: v for k, v in results.items() if k in albu_keys}
+        non_albu_data = {k: v for k, v in results.items() if k not in albu_keys}
+        albu_output = self.aug(**albu_input)
+        results = {**non_albu_data, **albu_output}
 
         # Convert back to BGR
         if self.bgr_to_rgb:

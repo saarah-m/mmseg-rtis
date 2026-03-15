@@ -1,13 +1,21 @@
 _base_ = ['./ocrnet_hr48_4xb2-160k_cityscapes-512x1024.py']
 dataset_type = 'RailSem19Dataset'
+
+# Override norm_cfg to use regular BN instead of SyncBN for single GPU training
+norm_cfg = dict(type='BN', requires_grad=True)
+model = dict(
+    backbone=dict(norm_cfg=norm_cfg),
+    decode_head=[
+        dict(norm_cfg=norm_cfg),
+        dict(norm_cfg=norm_cfg)])
 data_root = 'data/RailSem19/'
-crop_size = (1080, 1920)
+crop_size = (576, 1024)
 train_pipeline = [
     dict(type='LoadImageFromFile'),
     dict(type='LoadAnnotations'),
     dict(
         type='RandomChoiceResize',
-        scales=[(int(1080 * 0.5), int(1920 * 0.5)), (1080, 1920), (int(1080 * 2), int(1920 * 2))],
+        scales=[(288, 512), (576, 1024), (1152, 2048)],
         resize_type='Resize',
         keep_ratio=True),
     dict(type='RandomCrop', crop_size=crop_size, cat_max_ratio=0.75),
@@ -27,12 +35,12 @@ train_pipeline = [
 ]
 test_pipeline = [
     dict(type='LoadImageFromFile'),
-    dict(type='Resize', scale=(1080, 1920), keep_ratio=True),
+    dict(type='Resize', scale=(576, 1024), keep_ratio=True),
     dict(type='LoadAnnotations'),
     dict(type='PackSegInputs')
 ]
 train_dataloader = dict(
-    batch_size=2,
+    batch_size=1,
     num_workers=4,
     dataset=dict(
         type=dataset_type,
@@ -62,8 +70,8 @@ visualizer = dict(type='SegLocalVisualizer', vis_backends=vis_backends, name='vi
 
 load_from = 'https://download.openmmlab.com/mmsegmentation/v0.5/ocrnet/ocrnet_hr48_512x1024_160k_cityscapes/ocrnet_hr48_512x1024_160k_cityscapes_20200602_191037-dfbf1b0c.pth'
 
-optimizer = dict(type='SGD', lr=0.0001, momentum=0.9, weight_decay=0.0001)
-optim_wrapper = dict(type='OptimWrapper', optimizer=optimizer, clip_grad=None)
+optimizer = dict(type='SGD', lr=0.0002, momentum=0.9, weight_decay=0.0001)
+optim_wrapper = dict(type='OptimWrapper', optimizer=optimizer, clip_grad=None, accumulative_counts=4)
 
 train_cfg = dict(type='IterBasedTrainLoop', max_iters=160000, val_interval=8000)
 param_scheduler = [
@@ -76,4 +84,5 @@ param_scheduler = [
         by_epoch=False)
 ]
 default_hooks = dict(
-    checkpoint=dict(type='CheckpointHook', by_epoch=False, interval=8000))
+    checkpoint=dict(type='CheckpointHook', by_epoch=False, interval=8000),
+    logger=dict(type='LoggerHook', interval=10, log_metric_by_epoch=False))
