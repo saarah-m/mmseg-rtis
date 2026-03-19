@@ -3,9 +3,32 @@ import collections
 import copy
 from typing import List, Optional, Sequence, Union
 
-from mmengine.dataset import ConcatDataset, force_full_init
+from mmengine.dataset import ConcatDataset as MMConcatDataset, force_full_init
 
 from mmseg.registry import DATASETS, TRANSFORMS
+
+ConcatDataset = MMConcatDataset  # alias for isinstance() in MultiImageMixDataset
+
+
+@DATASETS.register_module()
+class ConcatDatasetIgnoreExtra(MMConcatDataset):
+    """ConcatDataset that ignores extra config keys (e.g. data_root from merge).
+
+    Use when train_dataloader.dataset is overridden in a config that merges
+    with a base defining a single dataset; the merge can add keys that
+    ConcatDataset does not accept.
+    """
+
+    def __init__(self,
+                 datasets: Sequence,
+                 lazy_init: bool = False,
+                 ignore_keys=None,
+                 **kwargs):
+        super().__init__(
+            datasets=datasets,
+            lazy_init=lazy_init,
+            ignore_keys=ignore_keys,
+        )
 
 
 @DATASETS.register_module()

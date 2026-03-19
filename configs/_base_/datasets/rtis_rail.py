@@ -70,4 +70,8 @@ val_dataloader = dict(
 test_dataloader = val_dataloader
 
 val_evaluator = dict(type="IoUMetric", iou_metrics=["mIoU"])
+<<<<<<< HEAD
 test_evaluator = val_evaluator
+=======
+test_evaluator = val_evaluator
+>>>>>>> 0462cfa1d0b29c1ac2f0b00ccb2bda0475c05fc9

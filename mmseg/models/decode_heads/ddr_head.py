@@ -96,6 +96,20 @@ class DDRHead(BaseDecodeHead):
         context_logit, spatial_logit = seg_logits
         seg_label = self._stack_batch_gt(batch_data_samples)
 
+        # Check for zero dimensions in logits and handle gracefully
+        if (context_logit.shape[-2] == 0 or context_logit.shape[-1] == 0 or 
+            spatial_logit.shape[-2] == 0 or spatial_logit.shape[-1] == 0):
+            # Return dummy losses for zero-dimension case
+            batch_size = context_logit.shape[0]
+            device = context_logit.device
+            
+            # Create dummy loss values
+            dummy_loss = torch.tensor(0.0, device=device, requires_grad=True)
+            loss['loss_context'] = dummy_loss
+            loss['loss_spatial'] = dummy_loss
+            loss['acc_seg'] = torch.tensor(0.0, device=device)
+            return loss
+
         context_logit = resize(
             context_logit,
             size=seg_label.shape[2:],

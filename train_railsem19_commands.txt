@@ -1,0 +1,9 @@
+python tools/train.py configs/mask2former/mask2former_swin-l-in22k-384x384-pre_1xb1-160k_railsem19-576x1024.py
+python tools/train.py configs/segformer/segformer_mit-b5_1xb1-160k_railsem19-576x1024.py
+python tools/train.py configs/deeplabv3plus/deeplabv3plus_r101-d8_1xb1-160k_railsem19-576x1024.py
+python tools/train.py configs/upernet/upernet_r101_1xb1-160k_railsem19-576x1024.py
+python tools/train.py configs/pspnet/pspnet_r101-d8_1xb1-160k_railsem19-576x1024.py
+python tools/train.py configs/ocrnet/ocrnet_hr48_1xb2-160k_railsem19-576x1024.py
+python tools/train.py configs/bisenetv2/bisenetv2_fcn_1xb2-160k_railsem19-576x1024.py
+python tools/train.py configs/fcn/fcn_r101-d8_1xb1-160k_railsem19-576x1024.py
+python tools/train.py configs/unet/unet-s5-d16_fcn_1xb1-160k_railsem19-576x1024.py

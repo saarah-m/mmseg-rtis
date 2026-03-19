@@ -488,6 +488,25 @@ def hsidrive_palette():
             [255, 166, 0], [0, 204, 204]]
 
 
+def railsem19_classes():
+    """RailSem19 class names for external use."""
+    return [
+        'road', 'sidewalk', 'construction', 'tram-track', 'fence', 'pole',
+        'traffic-light', 'traffic-sign', 'vegetation', 'terrain', 'sky',
+        'human', 'rail-track', 'car', 'truck', 'trackbed', 'on-rails',
+        'rail-raised', 'rail-embedded'
+    ]
+
+
+def railsem19_palette():
+    """RailSem19 palette for external use."""
+    return [[128, 64, 128], [244, 35, 232], [70, 70, 70], [192, 0, 128],
+            [190, 153, 153], [153, 153, 153], [250, 170, 30], [220, 220, 0],
+            [107, 142, 35], [152, 251, 152], [70, 130, 180], [220, 20, 60],
+            [230, 150, 140], [0, 0, 142], [0, 0, 70], [90, 40, 40],
+            [0, 80, 100], [0, 254, 254], [0, 68, 63]]
+
+
 dataset_aliases = {
     'cityscapes': ['cityscapes'],
     'ade': ['ade', 'ade20k'],
@@ -510,7 +529,8 @@ dataset_aliases = {
     'hsidrive': [
         'hsidrive', 'HSIDrive', 'HSI-Drive', 'hsidrive20', 'HSIDrive20',
         'HSI-Drive20'
-    ]
+    ],
+    'railsem19': ['railsem19', 'RailSem19']
 }
 
 

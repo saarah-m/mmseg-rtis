@@ -1,4 +1,5 @@
 # Copyright (c) OpenMMLab. All rights reserved.
+import time
 import warnings
 from pathlib import Path
 from typing import Optional, Union
@@ -95,13 +96,16 @@ def init_model(config: Union[str, Path, Config],
 
 
 def inference_model(model: BaseSegmentor,
-                    img: ImageType) -> Union[SegDataSample, SampleList]:
+                    img: ImageType,
+                    measure_time: bool = False) -> Union[SegDataSample, SampleList]:
     """Inference image(s) with the segmentor.
 
     Args:
         model (nn.Module): The loaded segmentor.
         imgs (str/ndarray or list[str/ndarray]): Either image files or loaded
             images.
+        measure_time (bool): Whether to measure and print inference time.
+            Defaults to False.
 
     Returns:
         :obj:`SegDataSample` or list[:obj:`SegDataSample`]:
@@ -113,7 +117,26 @@ def inference_model(model: BaseSegmentor,
 
     # forward the model
     with torch.no_grad():
-        results = model.test_step(data)
+        if measure_time:
+            # Synchronize GPU if available
+            if torch.cuda.is_available():
+                torch.cuda.synchronize()
+            
+            start_time = time.perf_counter()
+            results = model.test_step(data)
+            end_time = time.perf_counter()
+            
+            # Calculate timing statistics
+            inference_time = end_time - start_time
+            batch_size = len(results) if isinstance(results, list) else 1
+            time_per_frame = inference_time / batch_size
+            fps = batch_size / inference_time if inference_time > 0 else 0
+            
+            print(f'Inference completed in {inference_time:.4f}s')
+            print(f'Time per frame: {time_per_frame:.4f}s')
+            print(f'FPS: {fps:.2f}')
+        else:
+            results = model.test_step(data)
 
     return results if is_batch else results[0]
 

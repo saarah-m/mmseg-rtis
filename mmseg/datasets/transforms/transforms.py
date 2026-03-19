@@ -2434,8 +2434,14 @@ class Albu(BaseTransform):
                         results[key] = cv2.cvtColor(results[key],
                                                     cv2.COLOR_BGR2RGB)
 
-        # Apply Transform
-        results = self.aug(**results)
+        # Apply Transform - only pass relevant keys to albumentations
+        albu_keys = set(self.keymap_to_albu.values())
+        if self.additional_targets:
+            albu_keys.update(self.additional_targets.keys())
+        albu_input = {k: v for k, v in results.items() if k in albu_keys}
+        non_albu_data = {k: v for k, v in results.items() if k not in albu_keys}
+        albu_output = self.aug(**albu_input)
+        results = {**non_albu_data, **albu_output}
 
         # Convert back to BGR
         if self.bgr_to_rgb:
@@ -2535,3 +2541,68 @@ class RandomDepthMix(BaseTransform):
 
         results['img'] = img
         return results
+
+
+@TRANSFORMS.register_module()
+class GaussianBlur(BaseTransform):
+    """Apply Gaussian blur to an image with random kernel size and sigma.
+
+    This is a general-purpose Gaussian blur augmentation for 2-D images
+    (H, W, C) stored as uint8 or float32 numpy arrays.
+
+    Required Keys:
+
+    - img
+
+    Modified Keys:
+
+    - img
+
+    Args:
+        kernel_size_range (tuple[int, int]): Range of odd kernel sizes.
+            A kernel size is sampled uniformly from
+            ``range(kernel_size_range[0], kernel_size_range[1] + 1, 2)``.
+            Default: ``(3, 7)``.
+        sigma_range (tuple[float, float]): Range of sigma values.
+            Default: ``(0.1, 2.0)``.
+        prob (float): Probability to apply the augmentation.
+            Default: ``0.5``.
+    """
+
+    def __init__(self,
+                 kernel_size_range: Tuple[int, int] = (3, 7),
+                 sigma_range: Tuple[float, float] = (0.1, 2.0),
+                 prob: float = 0.5) -> None:
+        super().__init__()
+        assert 0.0 <= prob <= 1.0
+        assert kernel_size_range[0] % 2 == 1 and kernel_size_range[1] % 2 == 1
+        self.kernel_size_range = kernel_size_range
+        self.sigma_range = sigma_range
+        self.prob = prob
+
+    def transform(self, results: dict) -> dict:
+        """Apply Gaussian blur with random parameters.
+
+        Args:
+            results (dict): Result dict from loading pipeline.
+
+        Returns:
+            dict: Result dict with blurred image.
+        """
+        if random.random() < self.prob:
+            img = results['img']
+            # Sample an odd kernel size
+            k_min, k_max = self.kernel_size_range
+            possible_sizes = list(range(k_min, k_max + 1, 2))
+            ksize = int(random.choice(possible_sizes))
+            sigma = random.uniform(self.sigma_range[0], self.sigma_range[1])
+            img = cv2.GaussianBlur(img, (ksize, ksize), sigmaX=sigma)
+            results['img'] = img
+        return results
+
+    def __repr__(self) -> str:
+        repr_str = self.__class__.__name__
+        repr_str += (f'(kernel_size_range={self.kernel_size_range}, '
+                     f'sigma_range={self.sigma_range}, '
+                     f'prob={self.prob})')
+        return repr_str

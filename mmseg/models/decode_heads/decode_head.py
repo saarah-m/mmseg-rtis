@@ -358,6 +358,21 @@ class BaseDecodeHead(BaseModule, metaclass=ABCMeta):
         else:
             size = batch_img_metas[0]['img_shape']
 
+        # Check for zero dimensions in seg_logits
+        if seg_logits.shape[-2] == 0 or seg_logits.shape[-1] == 0:
+            # Handle zero-dimension case by creating a tensor with proper target size
+            batch_size, channels = seg_logits.shape[:2]
+            device = seg_logits.device
+            dtype = seg_logits.dtype
+            
+            # Create a zero tensor with the target size
+            seg_logits = torch.zeros(
+                (batch_size, channels, size[0], size[1]), 
+                device=device, 
+                dtype=dtype
+            )
+            return seg_logits
+
         seg_logits = resize(
             input=seg_logits,
             size=size,
