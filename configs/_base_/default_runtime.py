@@ -9,7 +9,10 @@ visualizer = dict(
     type='SegLocalVisualizer', vis_backends=vis_backends, name='visualizer')
 log_processor = dict(by_epoch=False)
 log_level = 'INFO'
-load_from = None
-resume = False
+
+
+#These lines may be messing with fine-tuning, turned off for testing
+# load_from = None
+# resume = False
 
 tta_model = dict(type='SegTTAModel')

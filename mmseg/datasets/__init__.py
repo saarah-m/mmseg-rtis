@@ -27,10 +27,6 @@ from .railsem19 import RailSem19Dataset
 from .refuge import REFUGEDataset
 from .stare import STAREDataset
 from .synapse import SynapseDataset
-<<<<<<< HEAD
-from .railsem19 import RailSem19Dataset
-=======
->>>>>>> 0462cfa1d0b29c1ac2f0b00ccb2bda0475c05fc9
 from .rtis_rail import RTISRailDataset
 # yapf: disable
 from .transforms import (CLAHE, AdjustGamma, Albu, BioMedical3DPad,
@@ -49,73 +45,9 @@ from .voc import PascalVOCDataset
 
 # yapf: enable
 __all__ = [
-<<<<<<< HEAD
-    "BaseSegDataset",
-    "BioMedical3DRandomCrop",
-    "BioMedical3DRandomFlip",
-    "CityscapesDataset",
-    "PascalVOCDataset",
-    "ADE20KDataset",
-    "PascalContextDataset",
-    "PascalContextDataset59",
-    "ChaseDB1Dataset",
-    "DRIVEDataset",
-    "HRFDataset",
-    "STAREDataset",
-    "DarkZurichDataset",
-    "NightDrivingDataset",
-    "COCOStuffDataset",
-    "LoveDADataset",
-    "MultiImageMixDataset",
-    "iSAIDDataset",
-    "ISPRSDataset",
-    "PotsdamDataset",
-    "LoadAnnotations",
-    "RandomCrop",
-    "SegRescale",
-    "PhotoMetricDistortion",
-    "RandomRotate",
-    "AdjustGamma",
-    "CLAHE",
-    "Rerange",
-    "RGB2Gray",
-    "RandomCutOut",
-    "RandomMosaic",
-    "PackSegInputs",
-    "ResizeToMultiple",
-    "LoadImageFromNDArray",
-    "LoadBiomedicalImageFromFile",
-    "LoadBiomedicalAnnotation",
-    "LoadBiomedicalData",
-    "GenerateEdge",
-    "DecathlonDataset",
-    "LIPDataset",
-    "ResizeShortestEdge",
-    "BioMedicalGaussianNoise",
-    "BioMedicalGaussianBlur",
-    "BioMedicalRandomGamma",
-    "BioMedical3DPad",
-    "RandomRotFlip",
-    "SynapseDataset",
-    "REFUGEDataset",
-    "MapillaryDataset_v1",
-    "MapillaryDataset_v2",
-    "Albu",
-    "LEVIRCDDataset",
-    "LoadMultipleRSImageFromFile",
-    "LoadSingleRSImageFromFile",
-    "ConcatCDInput",
-    "BaseCDDataset",
-    "DSDLSegDataset",
-    "BDD100KDataset",
-    "NYUDataset",
-    "HSIDrive20Dataset",
-    "RailSem19Dataset",
-    "RTISRailDataset",
-=======
     'BaseSegDataset', 'BioMedical3DRandomCrop', 'BioMedical3DRandomFlip',
     'CityscapesDataset', 'PascalVOCDataset', 'ADE20KDataset',
-    'RailSem19Dataset', 'PascalContextDataset', 'PascalContextDataset59', 'ChaseDB1Dataset',
+    'PascalContextDataset', 'PascalContextDataset59', 'ChaseDB1Dataset',
     'DRIVEDataset', 'HRFDataset', 'STAREDataset', 'DarkZurichDataset',
     'NightDrivingDataset', 'COCOStuffDataset', 'LoveDADataset',
     'MultiImageMixDataset', 'iSAIDDataset', 'ISPRSDataset', 'PotsdamDataset',
@@ -131,6 +63,5 @@ __all__ = [
     'MapillaryDataset_v2', 'Albu', 'LEVIRCDDataset',
     'LoadMultipleRSImageFromFile', 'LoadSingleRSImageFromFile',
     'ConcatCDInput', 'BaseCDDataset', 'DSDLSegDataset', 'BDD100KDataset',
-    'NYUDataset', 'HSIDrive20Dataset'
->>>>>>> 0462cfa1d0b29c1ac2f0b00ccb2bda0475c05fc9
+    'NYUDataset', 'HSIDrive20Dataset', 'RailSem19Dataset', 'RTISRailDataset'
 ]
